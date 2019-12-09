@@ -1,38 +1,79 @@
 import sys
 
+class IntComputer:
+
+    INCREMENTS = {
+        99: 1,
+        1: 4,
+        2: 4,
+        3: 2,
+        4: 2,
+    }
+
+    def __init__(self, string):
+        self.expr = [int(i) for i in string.split(",")]
+        self.i = 0
+
+    def get_op(self):
+        return self.expr[self.i]
+
+    def get_pos(self, val):
+        return self.expr[self.i + val]
+
+    def get_arg(self, val):
+        pos = self.get_pos(val)
+        return self.expr[pos]
+
+    def run(self):
+        while True:
+            op = self.get_op()
+
+            # Exit
+            if op == 99:
+                return self.expr[0]
+
+            # Addition
+            elif op == 1:
+                arg1 = self.get_arg(1)
+                arg2 = self.get_arg(2)
+                store_pos = self.get_pos(3)
+
+                self.expr[store_pos] = arg1 + arg2
+
+            # Multiplication
+            elif op == 2:
+                arg1 = self.get_arg(1)
+                arg2 = self.get_arg(2)
+                store_pos = self.get_pos(3)
+
+                self.expr[store_pos] = arg1 * arg2
+
+            # Input
+            elif op == 3:
+                store_pos = self.get_pos(1)
+                val = int(input("Input: "))
+                self.expr[store_pos] = val
+
+            # Output
+            elif op == 4:
+                arg1 = self.get_arg(1)
+                print(arg1)
+
+            self.i += self.INCREMENTS[op]
+
+
 for line in sys.stdin:
-    if line.endswith("\n"):
-        line = line[:-1]
+    line = line[:-1] if line.endswith("\n") else line
+    ipc = IntComputer(line)
+    ans = ipc.run()
+    print("Answer 1: " + str(ans))
 
-    expr = line.split(",")
-    expr_old = [int(x) for x in expr]
-
-    for x in range(100):
-        for y in range(100):
-
-            expr = expr_old.copy()
-
-            expr[1] = x
-            expr[2] = y
-
-            i = 0
-
-            while True:
-                op = expr[i]
-
-                if op == 99:
-                    if expr[0] == 19690720:
-                        print(expr[1])
-                        print(expr[2])
-                    break
-
-                pos1 = expr[i + 1]
-                pos2 = expr[i + 2]
-                store_pos = expr[i + 3]
-
-                if op == 1:
-                    expr[store_pos] = expr[pos1] + expr[pos2]
-                elif op == 2:
-                    expr[store_pos] = expr[pos1] * expr[pos2]
-
-                i += 4
+for noun in range(100):
+    for verb in range(100):
+        ipc = IntComputer(line)
+        ipc.expr[1] = noun
+        ipc.expr[2] = verb
+        ans = ipc.run()
+        if ans == 19690720:
+            print("Answer 2: " + str(100 * noun + verb))
+            break
