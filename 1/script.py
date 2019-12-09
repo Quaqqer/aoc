@@ -1,15 +1,22 @@
 import sys
 
-ans = 0
 
+def calc_fuel(num):
+    return (num // 3) - 2
+
+def recursive_calc_fuel(num):
+    new_fuel = calc_fuel(num)
+    print(new_fuel)
+    if new_fuel <= 0:
+        return 0
+    return new_fuel + recursive_calc_fuel(new_fuel)
+
+ans1 = 0
+ans2 = 0
 for line in sys.stdin:
-    if line.endswith("\n"):
-        line = line[:-1]
-
     num = int(line)
-    num = num // 3
-    num -= 2
+    ans1 += calc_fuel(num)
+    ans2 += recursive_calc_fuel(num)
 
-    ans += num
-
-print(ans)
+print("Answer 1: " + str(ans1))
+print("Answer 2: " + str(ans2))
