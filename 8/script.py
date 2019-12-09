@@ -3,14 +3,17 @@ import sys
 dim = 25, 6
 size = dim[0] * dim[1]
 
+
 def get_zeros(layer):
     return layer.count("0")
+
 
 def get_pixel(i, stri):
     ans = stri[i]
     if ans == "2":
         return get_pixel(i, stri[size:])
     return "#" if ans == "1" else " "
+
 
 def print_image(stri):
     for y in range(dim[1]):
@@ -34,8 +37,8 @@ def calc(str):
     layer = str[lay * size : (lay + 1) * size]
     print(layer.count("1") * layer.count("2"))
 
-
     print(lay, amt_zeros_min)
+
 
 for line in sys.stdin:
     line = line[:-1] if line.endswith("\n") else line

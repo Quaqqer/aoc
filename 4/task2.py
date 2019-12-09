@@ -1,6 +1,7 @@
 min_val = 152085
 max_val = 670283
 
+
 def is_correct(num):
     num = str(num)
     last_val = 0
@@ -27,7 +28,7 @@ def is_correct(num):
 
 
 num = 0
-for i in range(min_val, max_val+1):
+for i in range(min_val, max_val + 1):
     if is_correct(i):
         num += 1
 print(num)

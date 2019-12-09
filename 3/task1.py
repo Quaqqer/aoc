@@ -3,6 +3,7 @@ import math
 import pygame
 import pygame.locals
 import time
+
 pygame.init()
 screen = pygame.display.set_mode((1000, 1000))
 
@@ -15,10 +16,11 @@ min_y = 0
 max_x = 0
 max_y = 0
 
+
 def create_wire(wire_map, moves):
     x, y = 0, 0
     mode = 1 if wire_map else 0
-    steps = 0 
+    steps = 0
     color = (0, 255, 0) if mode == 0 else (255, 0, 0)
     for move in moves:
         drct = move[0]
@@ -59,6 +61,7 @@ def create_wire(wire_map, moves):
                 if (x, y) not in wire_map:
                     wire_map[(x, y)] = steps
 
+
 for line in sys.stdin:
     if line.endswith("\n"):
         line = line[:-1]
@@ -92,18 +95,18 @@ min_y -= 5
 
 for pos in wire_map:
     x, y = pos
-    sx = int(((x - min_x)/(max_x - min_x)) * 1000)
-    sy = int(((y - min_y)/(max_y - min_y)) * 1000)
+    sx = int(((x - min_x) / (max_x - min_x)) * 1000)
+    sy = int(((y - min_y) / (max_y - min_y)) * 1000)
     screen.set_at((sx, sy), (0, 255, 0))
 
 for pos in wire_map2:
     x, y = pos
-    sx = int(((x - min_x)/(max_x - min_x)) * 1000)
-    sy = int(((y - min_y)/(max_y - min_y)) * 1000)
+    sx = int(((x - min_x) / (max_x - min_x)) * 1000)
+    sy = int(((y - min_y) / (max_y - min_y)) * 1000)
     screen.set_at((sx, sy), (255, 0, 0))
 
-x = int(((0 - min_x)/(max_x - min_x)) * 1000)
-y = int(((0 - min_y)/(max_y - min_y)) * 1000)
+x = int(((0 - min_x) / (max_x - min_x)) * 1000)
+y = int(((0 - min_y) / (max_y - min_y)) * 1000)
 pygame.draw.circle(screen, (0, 0, 255), (x, y), 3)
 
 pygame.display.flip()

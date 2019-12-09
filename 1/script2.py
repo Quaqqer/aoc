@@ -2,8 +2,10 @@ import sys
 
 ans = 0
 
+
 def calc_fuel(num):
     return (num // 3) - 2
+
 
 for line in sys.stdin:
     if line.endswith("\n"):

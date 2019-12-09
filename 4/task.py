@@ -1,6 +1,7 @@
 min_pass = 152085
 max_pass = 670283
 
+
 def is_correct(num):
     last = 0
     doubles = 0
@@ -20,6 +21,7 @@ def is_correct(num):
     if largest_doubles < 1:
         return False
     return True
+
 
 num = 0
 for i in range(min_pass, max_pass + 1):

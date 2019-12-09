@@ -1,6 +1,7 @@
 line = "3,9,8,9,10,9,4,9,99,-1,8"
 expr = [int(i) for i in line.split(",")]
 
+
 def run():
     i = 0
 
@@ -51,7 +52,7 @@ def run():
             val1 = expr[expr[i + 1]] if pm1 == 0 else expr[i + 1]
             val2 = expr[expr[i + 2]] if pm2 == 0 else expr[i + 2]
             if val1 != 0:
-                i = val2 
+                i = val2
             i += 3
 
         elif op == 6:
