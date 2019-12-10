@@ -74,8 +74,6 @@ killed = 0
 slos = list(best.los.items())
 slos.sort(key=sort_los)
 old_ang = -123
-for los in slos:
-    print(los[0])
 
 running = True
 i = -1
