@@ -1,5 +1,4 @@
 #!/bin/python3
-
 import re
 from aocd.models import Puzzle
 
@@ -18,27 +17,20 @@ def validate_a(fields):
             return False
     return len(searchedfields) == 7
 
-hgtx = re.compile("([0-9]+)(cm|in)")
 def hgt(x):
-    match = hgtx.match(x)
+    match = re.match("([0-9]+)(cm|in)", x)
     if not match:
         return False
     if match.group(2) == "cm":
         return 150 <= int(match.group(1)) <= 193
     if match.group(2) == "in":
         return 59 <= int(match.group(1)) <= 76
-    return False
 
-hclx = re.compile("#[0-9a-f]*")
 def hcl(x):
-    match = hclx.match(x)
+    match = re.match("#[0-9a-f]*", x)
     if not match:
         return False
     return len(match.group(0)) == 7
-
-eyecolors = {"amb", "blu", "brn", "gry", "grn", "hzl", "oth"}
-
-pidx = re.compile("[0-9]*")
 
 validation_map = {
     "byr": lambda x: 1920 <= int(x) <= 2002,
@@ -46,8 +38,8 @@ validation_map = {
     "eyr": lambda x: 2020 <= int(x) <= 2030,
     "hgt": hgt,
     "hcl": hcl,
-    "ecl": lambda x: x in eyecolors,
-    "pid": lambda x: len(pidx.match(x).group(0)) == 9
+    "ecl": lambda x: x in {"amb", "blu", "brn", "gry", "grn", "hzl", "oth"},
+    "pid": lambda x: len(re.match("[0-9]*", x).group(0)) == 9
 }
 
 def validate_b(fields):
@@ -70,11 +62,8 @@ for i in input:
     matches = fieldx.findall(i)
     st = {match[0]: match[1] for match in matches}
 
-    if validate_a(st):
-        valid_a += 1
-
-    if validate_b(st):
-        valid_b += 1
+    if validate_a(st): valid_a += 1
+    if validate_b(st): valid_b += 1
 
 print(f"Answer A: {valid_a}")
 print(f"Answer B: {valid_b}")
