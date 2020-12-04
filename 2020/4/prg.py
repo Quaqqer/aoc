@@ -5,11 +5,9 @@ from aocd.models import Puzzle
 puzzle = Puzzle(year=2020, day=4);
 input = puzzle.input_data.split("\n\n")
 
-requirements = {"byr", "iyr", "eyr", "hgt", "hcl", "ecl", "pid", "cid"}
-
 def validate_a(fields):
     for field in fields:
-        if field not in requirements:
+        if field not in {"byr", "iyr", "eyr", "hgt", "hcl", "ecl", "pid", "cid"}:
             return False
     return (len(fields) == 7 and "cid" not in fields) or len(fields) == 8
 
@@ -19,7 +17,7 @@ def hgt(x):
         return False
     if match.group(2) == "cm":
         return 150 <= int(match.group(1)) <= 193
-    else: # group 2 == "in"
+    else: # group(2) == "in"
         return 59 <= int(match.group(1)) <= 76
 
 def hcl(x):
@@ -50,8 +48,7 @@ valid_b = 0
 
 fieldx = re.compile("([a-z]+):([#a-z0-9]+)")
 for i in input:
-    matches = fieldx.findall(i)
-    st = {match[0]: match[1] for match in matches}
+    st = {match[0]: match[1] for match in fieldx.findall(i)}
 
     if validate_a(st): valid_a += 1
     if validate_b(st): valid_b += 1
