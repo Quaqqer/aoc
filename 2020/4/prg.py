@@ -11,20 +11,12 @@ def validate_a(fields):
             return False
     return (len(fields) == 7 and "cid" not in fields) or len(fields) == 8
 
-def hgt(x):
-    match = re.fullmatch("([0-9]+)(cm|in)", x)
-    if not match:
-        return False
-    if match.group(2) == "cm":
-        return 150 <= int(match.group(1)) <= 193
-    else: # group(2) == "in"
-        return 59 <= int(match.group(1)) <= 76
-
 validation_map = {
     "byr": lambda x: re.fullmatch("[0-9]{4}", x) and 1920 <= int(x) <= 2002,
     "iyr": lambda x: re.fullmatch("[0-9]{4}", x) and 2010 <= int(x) <= 2020,
     "eyr": lambda x: re.fullmatch("[0-9]{4}", x) and 2020 <= int(x) <= 2030,
-    "hgt": hgt,
+    "hgt": lambda x: (re.fullmatch("[0-9]{3}cm", x) and 150 <= int(x[:3]) <= 193)
+                  or (re.fullmatch("[0-9]{2}in", x) and  59 <= int(x[:2]) <= 76),
     "hcl": lambda x: bool(re.fullmatch("#[0-9a-f]{6}", x)),
     "ecl": lambda x: x in {"amb", "blu", "brn", "gry", "grn", "hzl", "oth"},
     "pid": lambda x: bool(re.fullmatch("[0-9]{9}", x)),
