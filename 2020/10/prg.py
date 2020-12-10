@@ -3,22 +3,16 @@ from aocd.models import Puzzle
 import functools
 
 puzzle = Puzzle(year=2020, day=10);
-input = [int(i) for i in puzzle.input_data.split("\n")]
+input = sorted([int(i) for i in puzzle.input_data.split("\n")])
 adapters = {i for i in input}
 
 power = 0
-delta = 1
-threes = 1
-ones = 0
-while (delta <= 3):
-    if power + delta in adapters:
-        power = power + delta
-        if delta == 3: threes += 1
-        if delta == 1: ones += 1
-        delta = 1
-    else:
-        delta += 1
-silver = ones * (threes)
+additions = {1: 0, 2:0, 3:0}
+for i in input:
+    if i <= power + 3:
+        additions[i - power] += 1
+        power = i
+silver = additions[1] * (additions[3] + 1)
 print(f"Silver: {silver}")
 
 @functools.cache
