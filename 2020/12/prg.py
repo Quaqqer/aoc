@@ -28,9 +28,8 @@ for i in input:
         x, y = x + -1 * v, y + 0 * v
 
 silver = abs(x) + abs(y)
-print(silver)
+print(f"Silver: {silver}")
 
-# Gold
 x, y = 0, 0
 waypoint = 10, -1
 for i in input:
@@ -52,8 +51,6 @@ for i in input:
         waypoint = waypoint[0] + 1 * v, waypoint[1] + 0 * v
     elif i[0] == "W":
         waypoint = waypoint[0] + -1 * v, waypoint[1] + 0 * v
-    print(f"Instruction: {i}")
-    print(f"x: {x}, y: {y}, wp: {waypoint}")
 
 gold = abs(x) + abs(y)
-print(gold)
+print(f"Gold: {gold}")
