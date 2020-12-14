@@ -26,8 +26,6 @@ for i in input:
 silver = sum(memory.values())
 print(f"Silver: {silver}")
 
-#silver =
-
 mask = ""
 memory = {}
 for i in input:
