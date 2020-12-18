@@ -7,91 +7,79 @@ puzzle = Puzzle(year=2020, day=18);
 input = puzzle.input_data.split("\n")
 
 num = re.compile("[0-9]+")
-
-def cvrt(i: str):
-    i = i.replace(" ", "")
-    res = []
-    while (i != ""):
-        n = num.match(i)
-        if n:
-            i = i[len(n.group(0)):]
-            res.append(int(n.group(0)))
-        elif i.startswith("("):
-            bal = 1
+def strtolist(curr: str):
+    curr = curr.replace(" ", "")
+    result = []
+    while (curr != ""):
+        number = num.match(curr)
+        if number:
+            result.append(int(number.group(0)))
+            curr = curr[len(number.group(0)):]
+        elif curr[0] == "(":
+            depth = 1
             pos = -1
-            for j in range(1, len(i)):
-                if i[j] == "(":
-                    bal += 1
-                elif i[j] == ")":
-                    bal -= 1
-                if bal == 0:
-                    pos = j
-                    break
-            res.append(cvrt(i[1:pos]))
-            i = i[pos+1:]
-        elif i[0] == "*":
-            res.append("*")
-            i = i[1:]
-        elif i[0] == "+":
-            res.append("+")
-            i = i[1:]
-        else:
-            print("WHAT")
-            print(i)
-    return res
+            for i in range(1, len(curr)):
+                if curr[i] == "(":
+                    depth += 1
+                elif curr[i] == ")":
+                    depth -= 1
+                    if depth == 0:
+                        pos = i
+                        break
+            result.append(strtolist(curr[1:pos]))
+            curr = curr[pos+1:]
+        elif curr[0] == "*":
+            result.append("*")
+            curr = curr[1:]
+        elif curr[0] == "+":
+            result.append("+")
+            curr = curr[1:]
+    return result
 
-def evaluate_a(lst):
-    if isinstance(lst, int):
-        return lst
-    elif len(lst) == 1:
-        return evaluate_a(lst[0])
-    elif len(lst) == 3:
-        if lst[1] == "+":
-            return evaluate_a(lst[0]) + evaluate_a(lst[2])
-        elif lst[1] == "*":
-            return evaluate_a(lst[0]) * evaluate_a(lst[2])
-    else:
-        return evaluate_a([evaluate_a(lst[0:3])] + lst[3:])
+def eval_a(expr) -> int:
+    if isinstance(expr, int):
+        return expr
+    elif len(expr) == 1:
+        return eval_a(expr[0])
+    elif len(expr) == 3:
+        if expr[1] == "+":
+            return eval_a(expr[0]) + eval_a(expr[2])
+        elif expr[1] == "*":
+            return eval_a(expr[0]) * eval_a(expr[2])
+    return eval_a([eval_a(expr[0:3])] + expr[3:])
 
-sum = 0
-for line in input:
-    sum += evaluate_a(cvrt(line))
-silver = sum
+silver = sum(eval_a(strtolist(line)) for line in input)
 print(f"Silver: {silver}")
 
-def evaluate_b(lst, checked=False) -> int:
-    if isinstance(lst, int):
-        return lst
-    elif len(lst) == 1:
-        return evaluate_b(lst[0])
-    elif len(lst) == 3:
-        if lst[1] == "+":
-            return evaluate_b(lst[0]) + evaluate_b(lst[2])
-        elif lst[1] == "*":
-            return evaluate_b(lst[0]) * evaluate_b(lst[2])
+def eval_b(expr) -> int:
+    if isinstance(expr, int):
+        return expr
+    elif len(expr) == 1:
+        return eval_b(expr[0])
+    elif len(expr) == 3:
+        if expr[1] == "+":
+            return eval_b(expr[0]) + eval_b(expr[2])
+        elif expr[1] == "*":
+            return eval_b(expr[0]) * eval_b(expr[2])
 
     i = 0
-    while i < len(lst):
-        if lst[i] == "+":
-            l = lst[:i-1]
-            r = lst[i+2:]
-            lst = l + [evaluate_b(lst[i-1:i+2])] + r
+    while i < len(expr):
+        if expr[i] == "+":
+            l = expr[:i-1]
+            r = expr[i+2:]
+            expr = l + [eval_b(expr[i-1:i+2])] + r
         else:
             i += 1
 
     i = 0
-    while i < len(lst):
-        if lst[i] == "*":
-            l = lst[:i-1]
-            r = lst[i+2:]
-            lst = l + [evaluate_b(lst[i-1:i+2])] + r
+    while i < len(expr):
+        if expr[i] == "*":
+            l = expr[:i-1]
+            r = expr[i+2:]
+            expr = l + [eval_b(expr[i-1:i+2])] + r
         else:
             i += 1
-    assert len(lst) == 1
-    return lst[0]
+    return expr[0]
 
-sum = 0
-for line in input:
-    sum += evaluate_b(cvrt(line))
-gold = sum
+gold = sum(eval_b(strtolist(line)) for line in input)
 print(f"Gold: {gold}")
