@@ -49,4 +49,3 @@ for i in input:
 
 gold = sum(memory.values())
 print(f"Gold: {gold}")
-puzzle.answer_b = gold
