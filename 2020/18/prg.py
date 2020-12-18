@@ -42,10 +42,7 @@ def eval_a(expr) -> int:
     elif len(expr) == 1:
         return eval_a(expr[0])
     elif len(expr) == 3:
-        if expr[1] == "+":
-            return eval_a(expr[0]) + eval_a(expr[2])
-        elif expr[1] == "*":
-            return eval_a(expr[0]) * eval_a(expr[2])
+        return eval(f"{eval_a(expr[0])} {expr[1]} {eval_a(expr[2])}")
     return eval_a([eval_a(expr[0:3])] + expr[3:])
 
 silver = sum(eval_a(strtolist(line)) for line in input)
@@ -57,10 +54,7 @@ def eval_b(expr) -> int:
     elif len(expr) == 1:
         return eval_b(expr[0])
     elif len(expr) == 3:
-        if expr[1] == "+":
-            return eval_b(expr[0]) + eval_b(expr[2])
-        elif expr[1] == "*":
-            return eval_b(expr[0]) * eval_b(expr[2])
+        return eval(f"{eval_a(expr[0])} {expr[1]} {eval_a(expr[2])}")
 
     i = 0
     while i < len(expr):
