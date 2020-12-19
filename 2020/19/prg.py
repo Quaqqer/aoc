@@ -37,7 +37,6 @@ def verify(lines, rule=0):
 
 silver = sum([1 for i in input[1] if "" in verify([i])])
 print(f"Silver: {silver}")
-assert silver == 272
 
 rules[8] = [[42], [42, 8]]
 rules[11] = [[42, 31], [42, 11, 31]]
