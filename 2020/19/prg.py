@@ -1,7 +1,6 @@
 #!/bin/python3
 
 import re
-import functools
 from aocd.models import Puzzle
 
 puzzle = Puzzle(year=2020, day=19);
