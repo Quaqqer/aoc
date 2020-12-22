@@ -2,7 +2,6 @@
 
 import re
 from aocd.models import Puzzle
-import time
 import queue
 
 puzzle = Puzzle(year=2020, day=20);
@@ -34,10 +33,7 @@ def flippedx(grid):
     return newgrid
 
 def flippedy(grid):
-    newgrid = [["" for x in range(len(grid))] for y in range(len(grid))]
-    for x in range(len(grid)):
-        for y in range(len(grid)):
-            newgrid[len(grid)-1-y][x] = grid[y][x]
+    newgrid = list(reversed(grid))
     return newgrid
 
 def permutations(grid):
