@@ -1,23 +1,9 @@
 #!/bin/python3
 
 from aocd.models import Puzzle
-import time
 
 puzzle = Puzzle(year=2020, day=22);
 data = puzzle.input_data
-#data = """Player 1:
-#9
-#2
-#6
-#3
-#1
-#
-#Player 2:
-#5
-#8
-#4
-#7
-#10"""
 input = [i.split("\n") for i in data.split("\n\n")]
 
 p1 = [int(i) for i in input[0][1:]]
