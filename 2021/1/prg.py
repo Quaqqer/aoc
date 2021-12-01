@@ -18,8 +18,6 @@ silver = increases(pairs(depths))
 three_sums = [depths[i] + depths[i+1] + depths[i+2] for i in range(0, len(depths) - 2)]
 gold = increases(pairs(three_sums))
 
-#
-
 # Print answers and send to aoc
 if "silver" in locals():
     print(f"Silver: {silver}")
