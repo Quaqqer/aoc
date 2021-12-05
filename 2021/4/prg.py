@@ -9,6 +9,7 @@ lines = puzzle.input_data.split("\n")
 
 calls = [int(v) for v in lines[0].split(",")]
 
+
 class BingoBoard:
     def __init__(self, strs):
         self.board = [[int(v) for v in row.split()] for row in strs]
@@ -21,7 +22,11 @@ class BingoBoard:
                 if num == self.board[row][col]:
                     self.marked[row][col] = True
 
-                    if self.winner or all(self.marked[row][c] for c in range(5)) or all(self.marked[r][col] for r in range(5)):
+                    if (
+                        self.winner
+                        or all(self.marked[row][c] for c in range(5))
+                        or all(self.marked[r][col] for r in range(5))
+                    ):
                         self.winner = True
 
     def __str__(self):
@@ -35,12 +40,14 @@ class BingoBoard:
                     s += self.board[row][col]
         return s * last_call
 
+
 boardlines = lines[1:]
 boards = []
 
 while len(boardlines) > 0:
     boards.append(BingoBoard(boardlines[1:6]))
     boardlines = boardlines[6:]
+
 
 def bingo_a(calls):
     ret_score = None
@@ -51,7 +58,6 @@ def bingo_a(calls):
         for board in boards:
             board.mark(call)
 
-
             if board.winner:
                 ret_score = board.score(call)
                 boards.remove(board)
@@ -59,13 +65,14 @@ def bingo_a(calls):
         if ret_score is not None:
             return ret_score
 
+
 def bingo_b(calls):
     while len(calls) > 0:
         call = calls[0]
         calls = calls[1:]
 
         dels = []
-        
+
         for board in boards:
             board.mark(call)
 
@@ -77,13 +84,14 @@ def bingo_b(calls):
         for dell in dels:
             boards.remove(dell)
 
+
 silver = bingo_a(calls)
 gold = bingo_b(calls)
 
 # Print answers and send to aoc
 if "silver" in locals():
-    print(f"Silver: {silver}") # type: ignore
-    puzzle.answer_a = silver # type: ignore
+    print(f"Silver: {silver}")  # type: ignore
+    puzzle.answer_a = silver  # type: ignore
 if "gold" in locals():
-    print(f"Gold: {gold}") # type: ignore
-    puzzle.answer_b = gold # type: ignore
+    print(f"Gold: {gold}")  # type: ignore
+    puzzle.answer_b = gold  # type: ignore

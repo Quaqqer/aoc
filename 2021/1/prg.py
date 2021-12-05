@@ -7,15 +7,22 @@ lines = puzzle.input_data.split("\n")
 
 # Main code
 
-increases = lambda pairs: sum(map(lambda p: p[1] > p[0], pairs))
 
-pairs = lambda lst: [(lst[i], lst[i+1]) for i in range(len(lst)-1)]
+def increases(pairs):
+    return sum(map(lambda p: p[1] > p[0], pairs))
+
+
+def pairs(lst):
+    return [(lst[i], lst[i + 1]) for i in range(len(lst) - 1)]
+
 
 depths = [int(line) for line in lines]
 
 silver = increases(pairs(depths))
 
-three_sums = [depths[i] + depths[i+1] + depths[i+2] for i in range(0, len(depths) - 2)]
+three_sums = [
+    depths[i] + depths[i + 1] + depths[i + 2] for i in range(0, len(depths) - 2)
+]
 gold = increases(pairs(three_sums))
 
 # Print answers and send to aoc

@@ -1,4 +1,7 @@
 #!/usr/bin/env python3
+import re
+from collections import defaultdict
+
 from aocd.models import Puzzle
 
 # Parse input
@@ -6,9 +9,6 @@ puzzle = Puzzle(2021, 5)
 lines = puzzle.input_data.split("\n")
 
 # Main code
-
-import re
-from collections import defaultdict
 
 regex = re.compile("([0-9]+),([0-9]+) -> ([0-9]+),([0-9]+)")
 
@@ -48,15 +48,15 @@ for line in lines:
         m = y1 - x1 * k
 
         for x in range(min(x1, x2), max(x1, x2) + 1):
-            key = (x, k*x + m)
+            key = (x, k * x + m)
             intersects[key] += 1
 
 gold = sum(map(lambda v: v >= 2, intersects.values()))
 
 # Print answers and send to aoc
 if "silver" in locals():
-    print(f"Silver: {silver}") # type: ignore
-    puzzle.answer_a = silver # type: ignore
+    print(f"Silver: {silver}")  # type: ignore
+    puzzle.answer_a = silver  # type: ignore
 if "gold" in locals():
-    print(f"Gold: {gold}") # type: ignore
-    puzzle.answer_b = gold # type: ignore
+    print(f"Gold: {gold}")  # type: ignore
+    puzzle.answer_b = gold  # type: ignore
