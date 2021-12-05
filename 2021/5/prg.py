@@ -15,7 +15,7 @@ regex = re.compile("([0-9]+),([0-9]+) -> ([0-9]+),([0-9]+)")
 intersects = defaultdict(int)
 
 for line in lines:
-    match = regex.match(line)
+    match = regex.fullmatch(line)
     assert match
 
     x1, y1, x2, y2 = tuple(int(v) for v in match.groups())
