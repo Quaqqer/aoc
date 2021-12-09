@@ -5,12 +5,13 @@ from aocd.models import Puzzle
 
 # Parse input
 puzzle = Puzzle(2021, 6)
-lines = puzzle.input_data.split("\n")
+lines = puzzle.input_data
+lines = "3,4,3,1,2"
 
 # Main code
 
 fish = defaultdict(int)
-for f in lines[0].split(","):
+for f in lines.split(","):
     f = int(f)
     fish[f] += 1
 
