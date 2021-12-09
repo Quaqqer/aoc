@@ -54,10 +54,10 @@ def basin_size(row, col) -> int:
         size += 1
 
         r, c = q.get()
-        for n in neighbours(r, c):
-            if n not in visited and heights[n[0]][n[1]] < 9:
-                visited.add(n)
-                q.put(n)
+        for (nr, nc) in neighbours(r, c):
+            if (nr, nc) not in visited and heights[nr][nc] < 9:
+                visited.add((nr, nc))
+                q.put((nr, nc))
     return size
 
 
