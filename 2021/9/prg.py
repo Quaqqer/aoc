@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
 import queue
+from functools import reduce
 
 from aocd.models import Puzzle
 
@@ -8,56 +9,60 @@ puzzle = Puzzle(2021, 9)
 lines = puzzle.input_data.split("\n")
 
 
-heights = [[int(c) for c in row] for row in lines]
-
-
 # Main code
+heights = [[int(c) for c in row] for row in lines]
+rows = len(heights)
+cols = len(heights[0])
+
+neighbouring_deltas = [(1, 0), (-1, 0), (0, 1), (0, -1)]
+
+
+def in_bounds(row, col):
+    return 0 <= row < rows and 0 <= col < cols
+
+
 def neighbours(row, col):
-    vals = []
-    for (dx, dy) in [(1, 0), (-1, 0), (0, 1), (0, -1)]:
-        if 0 <= row + dy < len(heights) and 0 <= col + dx < len(heights[0]):
-            vals.append((row + dy, col + dx))
-    return vals
+    return [
+        (row + dr, col + dc)
+        for (dr, dc) in neighbouring_deltas
+        if in_bounds(row + dr, col + dc)
+    ]
 
 
-s = 0
-for row in range(len(lines)):
-    for col in range(len(lines[0])):
-        if all(
-            heights[row][col] < heights[nr][nc] for (nr, nc) in neighbours(row, col)
-        ):
-            s += heights[row][col] + 1
-
-silver = s
+def all_cells():
+    for row in range(rows):
+        for col in range(cols):
+            yield (row, col)
 
 
-def basin(row, col) -> int:
-    size = 0
-    visited = set()
+lows = [
+    (cr, cc)
+    for (cr, cc) in all_cells()
+    if all(heights[cr][cc] < heights[nr][nc] for (nr, nc) in neighbours(cr, cc))
+]
+silver = sum(heights[cr][cc] + 1 for (cr, cc) in lows)
+
+
+def basin_size(row, col) -> int:
+    visited = {(row, col)}
     q = queue.Queue()
     q.put((row, col))
 
+    size = 0
+
     while not q.empty():
-        r, c = q.get()
         size += 1
+
+        r, c = q.get()
         for n in neighbours(r, c):
             if n not in visited and heights[n[0]][n[1]] < 9:
                 visited.add(n)
                 q.put(n)
-    return size - 1
+    return size
 
 
-lows = []
-for row in range(len(lines)):
-    for col in range(len(lines[0])):
-        if all(
-            heights[row][col] < heights[nr][nc] for (nr, nc) in neighbours(row, col)
-        ):
-            lows.append((row, col))
-basins = [basin(r, c) for (r, c) in lows]
-basins.sort()
-print(basins)
-gold = basins[-1] * basins[-2] * basins[-3]
+best_basins = sorted([basin_size(r, c) for (r, c) in lows])[-3:]
+gold = reduce(int.__mul__, best_basins)
 
 
 # Print answers and send to aoc
