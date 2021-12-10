@@ -1,6 +1,4 @@
 #!/usr/bin/env python3
-from functools import reduce
-
 from aocd.models import Puzzle
 
 # Parse input
@@ -21,7 +19,7 @@ depths = [int(line) for line in lines]
 
 silver = increases(pairs(depths))
 
-three_sums = [reduce(int.__add__, depths[i:i + 3]) for i in range(0, len(depths) - 2)]
+three_sums = [sum(depths[i:i + 3]) for i in range(0, len(depths) - 2)]
 gold = increases(pairs(three_sums))
 
 # Print answers and send to aoc
