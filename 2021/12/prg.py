@@ -9,18 +9,17 @@ lines = puzzle.input_data.split("\n")
 
 
 # Main code
-connections = defaultdict(list)
-for line in lines:
-    a, b = tuple(line.split("-"))
-    connections[a].append(b)
-    connections[b].append(a)
+def dfs(path, connections, visited, paths, is_double):
+    """
+    Search through all connections.
 
+    :param path list[str]: Current path, starts with ["start"]
+    :param connections dict[str, list[str]]: Connections for each pos.
+    :param visited dict[str, int]: The amount of visitations per node.
+    :param paths list[str]: Output dictionary.
+    :param is_double bool: If a small cave has been visited double already.
+    """
 
-paths = []
-visited = set()
-
-
-def dfs(path, connections, visited, paths):
     pos = path[-1]
     if pos == "end":
         paths.append(path.copy())
@@ -29,37 +28,13 @@ def dfs(path, connections, visited, paths):
             c: str
             if c.isupper():
                 path.append(c)
-                dfs(path, connections, visited, paths)
-            elif c not in visited:
-                visited.add(c)
-                path.append(c)
-                dfs(path, connections, visited, paths)
-                visited.remove(c)
-    path.pop()
-
-
-dfs(["start"], connections, {"start"}, paths)
-silver = len(paths)
-
-paths = []
-
-
-def dfs(path, connections, visited, paths, double_visited):
-    pos = path[-1]
-    if pos == "end":
-        paths.append(path.copy())
-    else:
-        for c in connections[pos]:
-            c: str
-            if c.isupper():
-                path.append(c)
-                dfs(path, connections, visited, paths, double_visited)
+                dfs(path, connections, visited, paths, is_double)
             elif visited[c] == 0:
                 visited[c] += 1
                 path.append(c)
-                dfs(path, connections, visited, paths, double_visited)
+                dfs(path, connections, visited, paths, is_double)
                 visited[c] -= 1
-            elif visited[c] == 1 and not double_visited:
+            elif visited[c] == 1 and not is_double:
                 visited[c] += 1
                 path.append(c)
                 dfs(path, connections, visited, paths, True)
@@ -67,8 +42,22 @@ def dfs(path, connections, visited, paths, double_visited):
     path.pop()
 
 
+connections = defaultdict(list)
+for line in lines:
+    a, b = tuple(line.split("-"))
+    connections[a].append(b)
+    connections[b].append(a)
+
+
 visited = defaultdict(int)
 visited["start"] = 2
+paths = []
+dfs(["start"], connections, visited, paths, True)
+silver = len(paths)
+
+visited = defaultdict(int)
+visited["start"] = 2
+paths = []
 dfs(["start"], connections, visited, paths, False)
 gold = len(paths)
 
