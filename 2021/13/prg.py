@@ -5,20 +5,16 @@ from aocd.models import Puzzle
 
 # Parse input
 puzzle = Puzzle(2021, 13)
-id = puzzle.input_data
-choord_lines, fold_lines = tuple(id.split("\n\n"))
+choord_input, fold_input = tuple(puzzle.input_data.split("\n\n"))
 
 
 # Main code
-choords = set()
 
-reg = re.compile("(.*),(.*)")
-for line in choord_lines.split("\n"):
-    match = reg.fullmatch(line)
-    assert match
-    x, y = int(match.group(1)), int(match.group(2))
-
-    choords.add((x, y))
+# get coordinates
+coords = set()
+for line in choord_input.split("\n"):
+    x, y = tuple(map(int, line.split(",")))
+    coords.add((x, y))
 
 
 def fold(choords, axis, v):
@@ -28,39 +24,40 @@ def fold(choords, axis, v):
             if x < v:
                 nc.add((x, y))
             elif x > v:
-                nc.add((v + (v - x), y))
+                nc.add((v * 2 - x, y))
     else:
         assert axis == "y"
         for (x, y) in choords:
             if y < v:
                 nc.add((x, y))
             elif y > v:
-                nc.add((x, v + (v - y)))
+                nc.add((x, v * 2 - y))
     return nc
 
 
-reg = re.compile("fold along (x|y)=(.*)")
-for line in fold_lines.split("\n"):
-    print(line)
+# do folds
+reg = re.compile("fold along (x|y)=([0-9]+)")
+for line in fold_input.split("\n"):
     match = reg.match(line)
     assert match
-    axis = match.group(1)
-    v = int(match.group(2))
+    axis, v = match.group(1), int(match.group(2))
 
-    choords = fold(choords, axis, v)
+    coords = fold(coords, axis, v)
 
     if "silver" not in locals():
-        silver = len(choords)
+        silver = len(coords)
 
+
+# print coords
 maxx, maxy = 0, 0
-for (x, y) in choords:
+for (x, y) in coords:
     maxx = max(maxx, x)
     maxy = max(maxy, y)
-
 for y in range(maxy + 1):
-    print("".join("█" if (x, y) in choords else " " for x in range(maxx + 1)))
+    print("".join("█" if (x, y) in coords else " " for x in range(maxx + 1)))
 
-gold = input("Please enter the letters that you can see above: ")
+# get gold from user input
+gold = input("Please enter the letters that you can see above: ").upper()
 
 
 # Print answers and send to aoc
