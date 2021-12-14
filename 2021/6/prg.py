@@ -6,7 +6,6 @@ from aocd.models import Puzzle
 # Parse input
 puzzle = Puzzle(2021, 6)
 lines = puzzle.input_data
-lines = "3,4,3,1,2"
 
 # Main code
 

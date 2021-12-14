@@ -70,8 +70,6 @@ for line in lines:
         else:  # its a six
             segmap[6] = set(snz)
 
-    print(segmap)
-
     val = 0
     for ow in output_words:
         number = [n for (n, m) in segmap.items() if m == set(ow)][0]
