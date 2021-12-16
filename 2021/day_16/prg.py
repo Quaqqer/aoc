@@ -9,12 +9,6 @@ input = [c for c in puzzle.input_data]
 
 
 # Main code
-# 3 bits encode packet version
-# next 3 encode type id
-# two values are numbers
-# id 4 is literal values
-# single binary number
-# id != 4 => operator
 conversions = {
     "0": "0000",
     "1": "0001",
