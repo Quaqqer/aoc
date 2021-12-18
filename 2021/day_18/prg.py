@@ -120,6 +120,13 @@ for rhs in snail_numbers[1:]:
     cur = add(cur, rhs)
 silver = magnitude(cur)
 
+gold = 0
+for i in range(len(snail_numbers)):
+    for j in range(len(snail_numbers)):
+        if i == j:
+            continue
+        gold = max(gold, magnitude(add(snail_numbers[i], snail_numbers[j])))
+
 
 # Print answers and send to aoc
 if "silver" in locals():
