@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 from collections import defaultdict
 from itertools import chain, permutations
+import itertools
 from typing import Optional
 
 import numpy as np
@@ -20,14 +21,12 @@ matrices = []
 for perm in permutations((0, 1, 2)):
     x, y, z = perm
 
-    for i in [-1, 1]:
-        for j in [-1, 1]:
-            for k in [-1, 1]:
-                vec = [[0, 0, 0], [0, 0, 0], [0, 0, 0]]
-                vec[0][x] = i
-                vec[1][y] = j
-                vec[2][z] = k
-                matrices.append(np.array(vec))
+    for xv, yv, zv in itertools.product((-1, 1), repeat=3):
+        vec = [[0, 0, 0], [0, 0, 0], [0, 0, 0]]
+        vec[0][x] = xv
+        vec[1][y] = yv
+        vec[2][z] = zv
+        matrices.append(np.array(vec))
 
 
 def r_intersects(bs1: list[np.ndarray], bs2: list[np.ndarray]) -> Optional[np.ndarray]:
