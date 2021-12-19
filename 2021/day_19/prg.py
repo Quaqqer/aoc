@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 from collections import defaultdict
-from itertools import permutations
+from itertools import chain, permutations
 from typing import Optional
 
 import numpy as np
@@ -61,20 +61,31 @@ def intersects(
     return None
 
 
-fixeds = {0}
+# Store which we have checked against to avoid double checking because it is pretty slow
+checked_against: dict[int, set[int]] = defaultdict(set)
+
+fixeds: set[int] = {0}
 positions = [np.array([0, 0, 0])]
 while len(fixeds) < len(scanners):
     for i in range(len(scanners)):
         if i not in fixeds:
             intersection = None
+
             for fixed in fixeds:
+                if fixed in checked_against[i]:
+                    continue
+
+                checked_against[i].add(fixed)
+
                 intersection = intersects(scanners[fixed], scanners[i])
                 if intersection is not None:
                     break
+
             if intersection is not None:
                 matrix, relative = intersection
                 scanners[i] = [matmul(matrix, v) + relative for v in scanners[i]]
                 positions.append(relative)
+
                 fixeds.add(i)
 
 all_beacons = set()
@@ -88,13 +99,16 @@ def manhattan_distance(v1, v2):
     return abs(v1[0] - v2[0]) + abs(v1[1] - v2[1]) + abs(v1[2] - v2[2])
 
 
-distances = []
-for i in range(len(positions)):
-    for j in range(len(positions)):
-        if i == j:
-            continue
-        distances.append(manhattan_distance(positions[i], positions[j]))
-gold = max(distances)
+gold = max(
+    chain.from_iterable(
+        [
+            manhattan_distance(positions[i], positions[j])
+            for j in range(len(positions))
+            if j != i
+        ]
+        for i in range(len(positions))
+    )
+)
 
 
 # Print answers and send to aoc
