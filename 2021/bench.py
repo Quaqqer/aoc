@@ -1,9 +1,7 @@
 import importlib
 import os
 
-days = ["day_" + str(d) for d in range(1, 26)]
-
-
-for day in days:
-    if os.path.exists(day + "/prg.py"):
-        importlib.import_module(day + ".prg")
+for day in range(1, 25 + 1):
+    pypath = f"day{day}.py"
+    if os.path.exists(pypath):
+        importlib.import_module(pypath.removesuffix(".py"))
