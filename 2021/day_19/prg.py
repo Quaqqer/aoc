@@ -8,9 +8,13 @@ from aocd.models import Puzzle
 from numpy import matmul
 
 puzzle = Puzzle(2021, 19)
-scanners_input = puzzle.input_data.split("\n\n")
-
-scanners: list[list[np.ndarray]] = []
+scanners: list[list[np.ndarray]] = [
+    [
+        np.array([int(v) for v in beacon.split(",")])
+        for beacon in scanner.splitlines()[1:]
+    ]
+    for scanner in puzzle.input_data.split("\n\n")
+]
 
 matrices = []
 for perm in permutations((0, 1, 2)):
@@ -26,36 +30,42 @@ for perm in permutations((0, 1, 2)):
                 matrices.append(np.array(vec))
 
 
-for i in range(len(scanners_input)):
-    beacons = scanners_input[i].splitlines()[1:]
-    scanner = []
-    for beacon in beacons:
-        b = np.array([int(v) for v in beacon.split(",")])
-        scanner.append(b)
-    scanners.append(scanner)
+def r_intersects(bs1: list[np.ndarray], bs2: list[np.ndarray]) -> Optional[np.ndarray]:
+    """
+    Intersection between two already rotated scanners.
 
-
-def _intersects(bs1: list[np.ndarray], bs2: list[np.ndarray]) -> Optional[np.ndarray]:
+    :param bs1 list[np.ndarray]: First list of beacons.
+    :param bs2 list[np.ndarray]: Second list of beacons.
+    :rtype Optional[np.ndarray]: Relative transformation, bs2 - bs1.
+    """
     # relative counter
     relatives = defaultdict(int)
     for b1 in bs1:
         for b2 in bs2:
-            relative = tuple(b1 - b2)
+            relative = tuple(b2 - b1)
             relatives[relative] += 1
             if relatives[relative] >= 12:
-                return b1 - b2
+                return b2 - b1
     return None
 
 
 def intersects(
     bs1: list[np.ndarray], bs2: list[np.ndarray]
 ) -> Optional[tuple[np.ndarray, np.ndarray]]:
+    """
+    The intersection between two scanners.
+
+    :param bs1 list[np.ndarray]: The first scanner, considered origo.
+    :param bs2 list[np.ndarray]: The second scanner, to rotate and transform.
+    :rtype Optional[tuple[np.ndarray, np.ndarray]]: Rotation and transformation of
+                                                    intersection.
+    """
     for matrix in matrices:
         rbs2 = []
         for b in bs2:
             rbs2.append(matmul(matrix, np.array(b)))
 
-        rel = _intersects(bs1, rbs2)
+        rel = r_intersects(bs1, rbs2)
         if rel is not None:
             return matrix, rel
     return None
@@ -83,7 +93,7 @@ while len(fixeds) < len(scanners):
 
             if intersection is not None:
                 matrix, relative = intersection
-                scanners[i] = [matmul(matrix, v) + relative for v in scanners[i]]
+                scanners[i] = [matmul(matrix, v) - relative for v in scanners[i]]
                 positions.append(relative)
 
                 fixeds.add(i)
