@@ -77,26 +77,27 @@ checked_against: dict[int, set[int]] = defaultdict(set)
 fixeds: set[int] = {0}
 positions = [np.array([0, 0, 0])]
 while len(fixeds) < len(scanners):
-    for i in range(len(scanners)):
-        if i not in fixeds:
-            intersection = None
+    for i, beacons in enumerate(scanners):
+        if i in fixeds:
+            continue
 
-            for fixed in fixeds:
-                if fixed in checked_against[i]:
-                    continue
+        intersection = None
+        for fixed in fixeds:
+            if fixed in checked_against[i]:
+                continue
 
-                checked_against[i].add(fixed)
+            checked_against[i].add(fixed)
 
-                intersection = intersects(scanners[fixed], scanners[i])
-                if intersection is not None:
-                    break
-
+            intersection = intersects(scanners[fixed], beacons)
             if intersection is not None:
-                matrix, relative = intersection
-                scanners[i] = [matmul(matrix, v) - relative for v in scanners[i]]
-                positions.append(relative)
+                break
 
-                fixeds.add(i)
+        if intersection is not None:
+            matrix, relative = intersection
+            scanners[i] = [matmul(matrix, v) - relative for v in beacons]
+            positions.append(relative)
+
+            fixeds.add(i)
 
 all_beacons = set()
 for beacons in scanners:
@@ -112,11 +113,11 @@ def manhattan_distance(v1, v2):
 gold = max(
     chain.from_iterable(
         [
-            manhattan_distance(positions[i], positions[j])
-            for j in range(len(positions))
+            manhattan_distance(p1, p2)
+            for j, p2 in enumerate(positions)
             if j != i
         ]
-        for i in range(len(positions))
+        for i, p1 in enumerate(positions)
     )
 )
 
