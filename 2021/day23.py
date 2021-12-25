@@ -150,8 +150,6 @@ class State:
 
 def astar(initial):
     q = [initial]
-    milestone = 1000
-
     visited = set()
 
     while len(q) > 0:
@@ -164,14 +162,7 @@ def astar(initial):
 
         visited.add(fm)
 
-        if s.cost >= milestone:
-            print(f"Cost {milestone} reached!")
-            print(s)
-            milestone += 1000
-
         if s.is_finished():
-            print("FINISHED:")
-            print(s)
             return s.cost
 
         for child in s.children():
@@ -182,7 +173,7 @@ def astar(initial):
 
 
 initial = State(lines)
-# silver = astar(initial)
+silver = astar(initial)
 
 gold_d_lines = [[c for c in line] for line in """  #D#C#B#A#
   #D#B#A#C#""".splitlines()]
