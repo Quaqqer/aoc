@@ -73,7 +73,6 @@ def draw(image: dict[tuple[int, int], bool], inf):
         print("".join(line))
 
 
-draw(image, inf)
 for _ in range(2):
     image, inf = apply(image, inf, algorithm)
 silver = sum(image.values())
