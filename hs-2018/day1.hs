@@ -12,10 +12,13 @@ solveA :: String -> IO ()
 solveA s = putStrLn $ "Silver: " ++ (s & words & map parseSigned & sum & show)
 
 solveB :: String -> IO ()
-solveB s = putStrLn $ "Gold: " ++ show (_solveB 0 (s & words & map parseSigned) S.empty)
+solveB s = putStrLn $ "Gold: " ++ show (_solveB 0 (s & words & map parseSigned) 0 S.empty)
 
-_solveB :: Integral i => i -> [i] -> S.Set i -> i
-_solveB cur (n : ns) prevs = if cur `S.member` prevs then cur else _solveB (cur + n) (ns ++ [n]) (S.insert cur prevs)
+_solveB :: Integral i => i -> [i] -> Int -> S.Set i -> i
+_solveB cur ops i prevs =
+  if cur `S.member` prevs
+    then cur
+    else _solveB (cur + ops !! (i `mod` length ops)) ops (i + 1) (S.insert cur prevs)
 
 parseSigned :: String -> Integer
 parseSigned s = (if head s == '+' then 1 else -1) * read (tail s)
