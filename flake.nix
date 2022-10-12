@@ -10,7 +10,7 @@
           nativeBuildInputs = [ pkgs.bashInteractive ];
           buildInputs = with pkgs; [
             ghc
-            (python310.withPackages (pyPkgs: with pyPkgs; [ aocd ]))
+            (python310.withPackages (pyPkgs: with pyPkgs; [ aocd pygame ]))
           ];
         };
       });
