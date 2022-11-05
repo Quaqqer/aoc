@@ -1,0 +1,96 @@
+#!/usr/bin/env python3
+from aocd.models import Puzzle
+
+# Parse input
+puzzle = Puzzle(2019, 5)
+lines = puzzle.input_data.split("\n")
+
+
+# Main code
+class IntcodePC:
+    def __init__(self, program: list[int], debug=False):
+        self.memory = program
+        self.pc: int = 0
+        self.debug = debug
+
+    def go1(self) -> int:
+        return self.go(1)[0]
+
+    def go(self, n) -> list[int]:
+        old_pc = self.pc
+        self.pc += n
+        return self.memory[old_pc : self.pc]
+
+    def read(self, n, immediate: bool = False) -> int:
+        return n if immediate else self.memory[n]
+
+    def write(self, v, n):
+        self.memory[n] = v
+
+    def read_op(self) -> tuple[int, bool, bool, bool]:
+        op = self.go1()
+        opcode = op % 100
+        im1 = (op // 100) % 10 == 1
+        im2 = (op // 1000) % 10 == 1
+        im3 = (op // 10000) % 10 == 1
+        return opcode, im1, im2, im3
+
+    def run(self):
+        while self.pc < len(self.memory):
+            if self.debug:
+                print(
+                    [
+                        m if i != self.pc else f"pc: {m}"
+                        for i, m in enumerate(self.memory)
+                    ]
+                )
+
+            opcode, im1, im2, im3 = self.read_op()
+
+            match opcode:
+                case 1:
+                    laddr, raddr, sumaddr = self.go(3)
+                    self.write(self.read(laddr, im1) + self.read(raddr, im2), sumaddr)
+                case 2:
+                    laddr, raddr, sumaddr = self.go(3)
+                    self.write(self.read(laddr, im1) * self.read(raddr, im2), sumaddr)
+                case 3:
+                    read = int(input())
+                    write_addr = self.go1()
+                    self.write(read, write_addr)
+                case 4:
+                    addr = self.go1()
+                    print(self.read(addr, im1))
+                case 5:
+                    cond, addr = self.go(2)
+                    if self.read(cond, im1) != 0:
+                        self.pc = self.read(addr, im2)
+                case 6:
+                    cond, addr = self.go(2)
+                    if self.read(cond, im1) == 0:
+                        self.pc = self.read(addr, im2)
+                case 7:
+                    lhs, rhs, addr = self.go(3)
+                    self.write(int(self.read(lhs, im1) < self.read(rhs, im2)), addr)
+                case 8:
+                    lhs, rhs, addr = self.go(3)
+                    self.write(int(self.read(lhs, im1) == self.read(rhs, im2)), addr)
+                case 99:
+                    return
+                case _:
+                    raise ValueError(f"Unknown op-code: {opcode}")
+
+
+program = [int(v) for v in lines[0].split(",")]
+
+silver_pc = IntcodePC(program.copy())
+silver_pc.run()
+
+
+# Print answers and send to aoc
+if "silver" in locals():
+    print(f"Silver: {silver}")  # type: ignore
+    puzzle.answer_a = silver  # type: ignore
+if "gold" in locals():
+    print(f"Gold: {gold}")  # type: ignore
+    puzzle.answer_b = gold  # type: ignore
