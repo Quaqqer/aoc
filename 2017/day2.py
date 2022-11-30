@@ -4,14 +4,16 @@ from aocd.models import Puzzle
 puzzle = Puzzle(2017, int("02"))
 id = puzzle.input_data
 
+
+def row_checksum(cols: list[int]) -> int:
+    return max(cols) - min(cols)
+
+
 # Main code
-sum_a = 0
-for line in id.splitlines():
-    row = [int(c) for c in line.split() if c]
-    mi = min(row)
-    ma = max(row)
-    sum_a += ma - mi
-puzzle.answer_a = sum_a
+puzzle.answer_a = sum(
+    row_checksum([int(c) for c in cols_str.split() if c])
+    for cols_str in id.splitlines()
+)
 
 
 def find_divisor(cs):
