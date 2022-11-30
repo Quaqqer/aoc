@@ -11,22 +11,14 @@ def row_checksum(cols: list[int]) -> int:
 
 # Main code
 puzzle.answer_a = sum(
-    row_checksum([int(c) for c in cols_str.split() if c])
-    for cols_str in id.splitlines()
+    max(row) - min(row)
+    for row in [[int(cell) for cell in line.split("\t")] for line in id.splitlines()]
 )
 
-
-def find_divisor(cs):
-    for x in cs:
-        for y in cs:
-            if x != y:
-                res = x / y
-                if res - int(res) == 0:
-                    return int(x / y)
-
-
-rows = []
-for line in id.splitlines():
-    row = [int(c) for c in line.split() if c]
-    rows.append(find_divisor(row))
-puzzle.answer_b = sum(rows)
+puzzle.answer_b = sum(
+    v1 // v2
+    for row in [[int(c) for c in row.split("\t")] for row in id.splitlines()]
+    for v1 in row
+    for v2 in row
+    if v1 % v2 == 0 and v1 != v2
+)
