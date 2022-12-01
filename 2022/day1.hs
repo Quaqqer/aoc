@@ -1,5 +1,6 @@
 {-# LANGUAGE ScopedTypeVariables #-}
 
+import Data.Function ((&))
 import Data.List
 import Data.List.Split
 
@@ -9,4 +10,4 @@ main = do
   let elvesSnacksSum = map sum elvesSnacks
 
   putStrLn $ "Part a: " ++ show (maximum elvesSnacksSum)
-  putStrLn $ "Part b: " ++ (show . sum . take 3 . reverse . sort) elvesSnacksSum
+  putStrLn $ "Part b: " ++ (sort elvesSnacksSum & reverse & take 3 & sum & show)
