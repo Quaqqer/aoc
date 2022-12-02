@@ -11,7 +11,7 @@ main = do
 
 -- | X -> A, Y -> B, Z -> C
 translateB :: Char -> Char
-translateB c = chr (ord c - 23)
+translateB c = chr (ord c - (ord 'X' - ord 'A'))
 
 scoreA :: (Char, Char) -> Int
 scoreA (a, b) =
@@ -22,7 +22,7 @@ scoreA (a, b) =
             -- If equal it's a tie
             | a == b -> 3
             -- If b is the next move from a it's a win
-            | ord b - 65 == (ord a - 65 + 1) `mod` 3 -> 6
+            | ord b - 65 == (ord a - ord 'A' + 1) `mod` 3 -> 6
             -- Otherwise it's a lose
             | otherwise -> 0
    in moveScore + resultScore
@@ -38,5 +38,5 @@ scoreB (a, b) =
         'C' -> (6, 1)
         _ -> error $ "Unexpected char '" ++ [b] ++ "'"
       -- Score the move
-      moveScore = ((ord a - 65 + moveDelta) `mod` 3) + 1
+      moveScore = ((ord a - ord 'A' + moveDelta) `mod` 3) + 1
    in resultScore + moveScore
