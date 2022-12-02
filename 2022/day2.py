@@ -7,16 +7,11 @@ id = puzzle.input_data
 # Main code
 score_a = 0
 
-score_b = 0
-for line in id.splitlines():
-    a, b = tuple(line.split(" "))
+translation = {"X": "A", "Y": "B", "Z": "C"}
 
-    if b == "X":
-        b = "A"
-    elif b == "Y":
-        b = "B"
-    elif b == "Z":
-        b = "C"
+for line in id.splitlines():
+    a, b_ = line.split(" ")
+    b = translation[b_]
 
     if b == "A":
         score_a += 1
@@ -27,47 +22,44 @@ for line in id.splitlines():
 
     if a == b:
         score_a += 3
-    elif a == 'A' and b == 'B':
+    elif a == "A" and b == "B":
         score_a += 6
-    elif a == 'B' and b == 'C':
+    elif a == "B" and b == "C":
         score_a += 6
-    elif a == 'C' and b == 'A':
+    elif a == "C" and b == "A":
         score_a += 6
+
+puzzle.answer_a = score_a
+
+score_b = 0
 
 for line in id.splitlines():
-    a, b = line.split(" ")
+    a, b_ = line.split(" ")
+    b = translation[b_]
 
-    if b == "X":
-        b = "A"
-    elif b == "Y":
-        b = "B"
-    elif b == "Z":
-        b = "C"
-
-    if b == 'A':
-        if a == 'A':
+    if b == "A":
+        if a == "A":
             score_b += 3
-        elif a == 'B':
+        elif a == "B":
             score_b += 1
-        elif a == 'C':
+        elif a == "C":
             score_b += 2
         score_b += 0
-    elif b == 'B':
-        if a == 'A':
+    elif b == "B":
+        if a == "A":
             score_b += 1
-        elif a == 'B':
+        elif a == "B":
             score_b += 2
-        elif a == 'C':
+        elif a == "C":
             score_b += 3
         score_b += 3
-    elif b == 'C':
-        if a == 'A':
+    elif b == "C":
+        if a == "A":
             score_b += 2
-        elif a == 'B':
+        elif a == "B":
             score_b += 3
-        elif a == 'C':
+        elif a == "C":
             score_b += 1
         score_b += 6
 
-puzzle.answer_a = score_a
 puzzle.answer_b = score_b
