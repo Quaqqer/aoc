@@ -9,9 +9,9 @@ sum_a = 0
 sum_b = 0
 
 for line in id.splitlines():
-    (lmin, lmax), (rmin, rmax) = map(
-        lambda s: [int(v) for v in s.split("-")], line.split(",")
-    )
+    (lmin, lmax), (rmin, rmax) = [
+        [int(v) for v in side.split("-")] for side in line.split(",")
+    ]
     l_set = set(range(lmin, lmax + 1))
     r_set = set(range(rmin, rmax + 1))
 
