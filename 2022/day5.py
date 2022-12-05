@@ -28,28 +28,28 @@ stacks_a = deepcopy(stacks)
 stacks_b = deepcopy(stacks)
 
 
-def move_a(n: int, fr: int, to: int) -> None:
+def move_a(n: int, from_: int, to: int) -> None:
     # N times
     for _ in range(n):
         # Remove an item from the from stack and add it to the to stack
-        stacks_a[to].append(stacks_a[fr].pop())
+        stacks_a[to].append(stacks_a[from_].pop())
 
 
-def move_b(n: int, fr: int, to: int) -> None:
+def move_b(n: int, from_: int, to: int) -> None:
     # Add the last n elements from the from stack to to the to stack
-    stacks_b[to] = stacks_b[to] + stacks_b[fr][-n:]
+    stacks_b[to] = stacks_b[to] + stacks_b[from_][-n:]
     # Remove n items from the from stack
-    stacks_b[fr] = stacks_b[fr][:-n]
+    stacks_b[from_] = stacks_b[from_][:-n]
 
 
 for move_line in moves.splitlines():
     m = re.match(r"move (\d+) from (\d+) to (\d+)", move_line)
     assert m
-    n, fr, to = map(int, m.groups())
+    n, from_, to = map(int, m.groups())
 
     # Do moves
-    move_a(n, fr, to)
-    move_b(n, fr, to)
+    move_a(n, from_, to)
+    move_b(n, from_, to)
 
 
 def ans(stacks: dict[Any, list[str]]) -> str:
