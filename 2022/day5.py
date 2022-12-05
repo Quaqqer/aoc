@@ -58,5 +58,6 @@ def ans(stacks: dict[Any, list[str]]) -> str:
     return "".join([stack[-1] for stack in stacks.values()])
 
 
+print(ans(stacks_a), ans(stacks_b))
 puzzle.answer_a = ans(stacks_a)
 puzzle.answer_b = ans(stacks_b)
