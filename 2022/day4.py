@@ -12,15 +12,11 @@ for line in id.splitlines():
     (lmin, lmax), (rmin, rmax) = [
         [int(v) for v in side.split("-")] for side in line.split(",")
     ]
-    l_set = set(range(lmin, lmax + 1))
-    r_set = set(range(rmin, rmax + 1))
 
-    intersection = l_set & r_set
-
-    if len(intersection) == len(l_set) or len(intersection) == len(r_set):
+    if (lmin <= rmin and rmax <= lmax) or (rmin <= lmin and lmax <= rmax):
         sum_a += 1
 
-    if intersection:
+    if not (rmax < lmin or lmax < rmin):
         sum_b += 1
 
 puzzle.answer_a = sum_a
