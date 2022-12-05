@@ -25,13 +25,13 @@ for line in id.splitlines():
     if a == b:
         score_a += 3
     # Win if b is the next character in the sequence [A, B, C] from a
-    elif b == chr(mod(ord(a) - 65 + 1, 3) + 65):
+    elif b == chr(mod(ord(a) - ord("A") + 1, 3) + ord("A")):
         score_a += 6
 
     # score_b
     result_score, move_delta = {"A": (0, 2), "B": (3, 0), "C": (6, 1)}[b]
     # A => loss and use next next move, B => tie and same, C => win and use next
-    score_b += result_score + (mod(ord(a) - 65 + move_delta, 3) + 1)
+    score_b += result_score + (mod(ord(a) - ord("A") + move_delta, 3) + 1)
 
 puzzle.answer_a = score_a
 puzzle.answer_b = score_b
