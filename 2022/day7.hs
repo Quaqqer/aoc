@@ -1,5 +1,6 @@
 {-# LANGUAGE NamedFieldPuns #-}
 {-# LANGUAGE QuasiQuotes #-}
+{-# LANGUAGE ScopedTypeVariables #-}
 
 import Data.Function ((&))
 import Data.List.Split (splitOn)
@@ -117,15 +118,14 @@ parseLsNodes lines =
   where
     lsLineToNode :: String -> LsNode
     lsLineToNode line =
-      let dirRegex :: (String, String, String, [String])
-          dirRegex = line Re.=~ [r|dir (.*)|]
-          (_, dirMatch, _, dirSubmatches) = dirRegex
+      let (_, dirMatch, _, dirSubmatches) ::
+            (String, String, String, [String]) =
+              line Re.=~ [r|dir (.*)|]
+          -- Needs to destructure this here to increase laziness
           [dirName] = dirSubmatches
 
-          fileRegex :: (String, String, String, [String])
-          fileRegex = line Re.=~ [r|([0-9]+) (.*)|]
-          (_, fileMatch, _, fileSubmatches) = fileRegex
-          [fileSize, fileName] = fileSubmatches
+          (_, fileMatch, _, [fileSize, fileName]) :: (String, String, String, [String]) =
+            line Re.=~ [r|([0-9]+) (.*)|]
        in if dirMatch /= ""
             then LsDir dirName
             else LsFile fileName (read fileSize)
