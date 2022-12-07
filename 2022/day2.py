@@ -19,7 +19,7 @@ for line in id.splitlines():
 
     # score_a
     # A => 1, B => 2, C => 3
-    score_a += ord(b) - 65 + 1
+    score_a += ord(b) - ord("A") + 1
 
     # Tie if they are the same
     if a == b:

@@ -9,7 +9,12 @@
         devShells.default = pkgs.mkShell {
           nativeBuildInputs = [ pkgs.bashInteractive ];
           buildInputs = with pkgs; [
-            (ghc.withPackages (hpkgs: [ hpkgs.advent-of-code-api hpkgs.split ]))
+            (ghc.withPackages (hpkgs: [
+              hpkgs.advent-of-code-api
+              hpkgs.split
+              hpkgs.regex-tdfa
+              hpkgs.raw-strings-qq
+            ]))
             (python310.withPackages (pyPkgs: with pyPkgs; [ aocd pygame ]))
           ];
         };
