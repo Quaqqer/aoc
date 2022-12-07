@@ -87,3 +87,6 @@ def b(path: dict | int, paths: str) -> tuple[int, Optional[int]]:
 
 tot_size, removal_size = b(root, "/")
 puzzle.answer_b = removal_size
+
+print(puzzle.answer_a)
+print(puzzle.answer_b)

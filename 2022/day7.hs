@@ -1,8 +1,10 @@
+{-# LANGUAGE NamedFieldPuns #-}
 {-# LANGUAGE QuasiQuotes #-}
 
 import Data.Function ((&))
 import Data.List.Split (splitOn)
 import qualified Data.Map as Map
+import Data.Maybe (catMaybes, fromJust)
 import Debug.Trace
 import Text.RawString.QQ
 import qualified Text.Regex.TDFA as Re
@@ -27,30 +29,53 @@ main = do
 
   let commands = parseCommands (tail $ lines input)
 
-  print $ head commands
+  let initFs = Dir Map.empty
 
-  let fs = Dir Map.empty
+  let (fs, _) = foldl executeCommand (initFs, []) commands
 
-  let newFs = foldl executeCommand (fs, "/") commands
+  let (usedSpace, answerA) = partA fs
 
-  print newFs
+  putStrLn $ "Part a: " ++ show answerA
+
+  let diskSpace = 70000000
+  let requiredFree = 30000000
+  let available = diskSpace - usedSpace
+  let missing = requiredFree - available
+
+  putStrLn $ "Part b: " ++ show (fromJust $ snd $ partB missing fs)
 
   return ()
 
-insertNode :: FSNode -> String -> FSNode -> FSNode
-insertNode root path node =
-  let (name, rest) = span (/= '/') (tail path)
-   in (if rest == ""
-        then root {files = Map.insert name node (files root)}
-        else root {files = Map.update (\dir -> Just $ insertNode dir rest node) name (files root)})
+partA :: FSNode -> (Int, Int)
+partA (File size) = (size, 0)
+partA (Dir {files}) =
+  let (sizes, ns) = map partA (Map.elems files) & unzip
+      size = sum sizes
+   in (size, sum ns + if size <= 100000 then size else 0)
 
-executeCommand :: (FSNode, String) -> Command -> (FSNode, String)
+partB :: Int -> FSNode -> (Int, Maybe Int)
+partB _ (File size) = (size, Nothing)
+partB missing (Dir {files}) =
+  let (sizes, childRemovalSizes) = map (partB missing) (Map.elems files) & unzip
+      size = sum sizes
+      thisRemovalSize = if size >= missing then Just size else Nothing
+      candidates = catMaybes (thisRemovalSize : childRemovalSizes)
+      bestRemovalSize = if null candidates then Nothing else Just $ minimum candidates
+   in (size, bestRemovalSize)
+
+insertNode :: FSNode -> [String] -> FSNode -> FSNode
+insertNode into@(Dir {files}) [name] node = into {files = Map.insert name node files}
+insertNode into@(Dir {files}) (head : tail) node =
+  into {files = Map.update (\dir -> Just $ insertNode dir tail node) head files}
+insertNode into path node = error ""
+
+executeCommand :: (FSNode, [String]) -> Command -> (FSNode, [String])
 executeCommand (root, cwd) (Ls lsNodes) =
   let newRoot =
         foldl
           ( \root lsNode ->
               let (fsNode, name) = lsToFsNode lsNode
-               in insertNode root (cwd ++ name ++ "/") fsNode
+               in insertNode root (cwd ++ [name]) fsNode
           )
           root
           lsNodes
@@ -58,12 +83,8 @@ executeCommand (root, cwd) (Ls lsNodes) =
 executeCommand (root, cwd) (Cd dir) =
   ( root,
     if dir == ".."
-      then
-        reverse cwd
-          & tail
-          & dropWhile (/= '/')
-          & reverse
-      else cwd ++ dir ++ "/"
+      then init cwd
+      else cwd ++ [dir]
   )
 
 lsToFsNode :: LsNode -> (FSNode, String)
