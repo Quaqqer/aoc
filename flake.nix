@@ -15,7 +15,8 @@
               hpkgs.regex-tdfa
               hpkgs.raw-strings-qq
             ]))
-            (python310.withPackages (pyPkgs: with pyPkgs; [ aocd pygame ]))
+            (python310.withPackages
+              (pyPkgs: with pyPkgs; [ aocd pygame numpy ]))
           ];
         };
       });
