@@ -1,4 +1,6 @@
-#!/usr/bin/env python3
+# 5   00:10:43   568      0   00:12:31   500      0
+# Went well today
+
 import re
 from collections import defaultdict
 from copy import deepcopy

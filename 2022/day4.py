@@ -1,4 +1,6 @@
-#!/usr/bin/env python3
+# 4   00:04:39  1120      0   00:08:58  1988      0
+# I guess 4:39 is slow...
+
 from aocd.models import Puzzle
 
 puzzle = Puzzle(2022, int("04"))

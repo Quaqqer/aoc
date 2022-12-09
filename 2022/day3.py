@@ -1,4 +1,6 @@
-#!/usr/bin/env python3
+# 3   00:05:15   640      0   00:17:00  2857      0
+# part 2 choke?
+
 from functools import reduce
 from typing import Iterable, Sequence, TypeVar
 

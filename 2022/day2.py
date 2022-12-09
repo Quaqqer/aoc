@@ -1,4 +1,5 @@
-#!/usr/bin/env python3
+# 2   00:05:34   578      0   00:10:22   851      0
+
 from aocd.models import Puzzle
 
 puzzle = Puzzle(2022, int("02"))

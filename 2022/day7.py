@@ -1,4 +1,6 @@
-#!/usr/bin/env python3
+# 7   00:30:40  2113      0   00:37:52  2013      0
+# alright I guess
+
 import re
 from typing import Optional
 

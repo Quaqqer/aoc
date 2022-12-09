@@ -1,4 +1,6 @@
-#!/usr/bin/env python3
+# 8   00:37:50  7130      0   01:07:27  7317      0
+# choke deluxe
+
 from aocd.models import Puzzle
 
 puzzle = Puzzle(2022, int("08"))

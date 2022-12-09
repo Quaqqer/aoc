@@ -1,4 +1,6 @@
-#!/usr/bin/env python3
+# 1   00:10:20  5425      0   00:11:29  4294      0
+# woke up 6:05 :-(
+
 from aocd.models import Puzzle
 
 puzzle = Puzzle(2022, int("01"))
