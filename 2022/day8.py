@@ -1,5 +1,5 @@
 # 8   00:37:50  7130      0   01:07:27  7317      0
-# choke deluxe
+# choke deluxe, should have read the problem
 
 from aocd.models import Puzzle
 
