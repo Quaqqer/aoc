@@ -46,7 +46,7 @@ def parse_monkey(chunk: str) -> Monkey:
 
 def solve(n: int, part_b: bool) -> int:
     monkeys = [parse_monkey(chunk) for chunk in id.split("\n\n")]
-    mod = math.lcm(*[monkey.divider for monkey in monkeys])
+    mod = math.lcm(*(monkey.divider for monkey in monkeys))
 
     for _ in range(n):
         for monkey in monkeys:
