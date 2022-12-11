@@ -18,6 +18,7 @@ class Monkey:
     divider: int
     true: int
     false: int
+    inspections: int = 0
 
 
 def subplay(monkey: Monkey, worry: int, part_b: bool, mod: int) -> tuple[int, int]:
@@ -28,11 +29,12 @@ def subplay(monkey: Monkey, worry: int, part_b: bool, mod: int) -> tuple[int, in
 
 def play(monkey: Monkey, part_b: bool, mod: int) -> list[tuple[int, int]]:
     thrown = [subplay(monkey, worry, part_b, mod) for worry in monkey.items]
+    monkey.inspections += len(thrown)
     monkey.items = []
     return thrown
 
 
-def parse_monkey(chunk: str):
+def parse_monkey(chunk: str) -> Monkey:
     lines = chunk.splitlines()
 
     items = list(map(int, re.findall(r"\d+", lines[1])))
@@ -44,19 +46,16 @@ def parse_monkey(chunk: str):
 
 def solve(n: int, part_b: bool) -> int:
     monkeys = [parse_monkey(chunk) for chunk in id.split("\n\n")]
-    inspections = [0 for _ in range(len(monkeys))]
     mod = math.lcm(*[monkey.divider for monkey in monkeys])
 
     for _ in range(n):
-        for i, monkey in enumerate(monkeys):
+        for monkey in monkeys:
             thrown = play(monkey, part_b, mod)
-
-            inspections[i] += len(thrown)
 
             for throw_to_monkey, item_worry in thrown:
                 monkeys[throw_to_monkey].items.append(item_worry)
 
-    *_, second_busiest_monkey, busiest_monkey = sorted(inspections)
+    *_, second_busiest_monkey, busiest_monkey = sorted([m.inspections for m in monkeys])
     return second_busiest_monkey * busiest_monkey
 
 
