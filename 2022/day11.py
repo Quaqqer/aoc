@@ -21,14 +21,15 @@ class Monkey:
     inspections: int = 0
 
 
-def subplay(monkey: Monkey, worry: int, part_b: bool, mod: int) -> tuple[int, int]:
+def inspect(monkey: Monkey, worry: int, part_b: bool, mod: int) -> tuple[int, int]:
     op_result = eval(monkey.operation.replace("old", str(worry)))
     new_worry = op_result % mod if part_b else op_result // 3
-    return (monkey.true if new_worry % monkey.divider == 0 else monkey.false, new_worry)
+    next_monkey = monkey.true if new_worry % monkey.divider == 0 else monkey.false
+    return (next_monkey, new_worry)
 
 
-def play(monkey: Monkey, part_b: bool, mod: int) -> list[tuple[int, int]]:
-    thrown = [subplay(monkey, worry, part_b, mod) for worry in monkey.items]
+def monkey_play(monkey: Monkey, part_b: bool, mod: int) -> list[tuple[int, int]]:
+    thrown = [inspect(monkey, worry, part_b, mod) for worry in monkey.items]
     monkey.inspections += len(thrown)
     monkey.items = []
     return thrown
@@ -50,13 +51,12 @@ def solve(n: int, part_b: bool) -> int:
 
     for _ in range(n):
         for monkey in monkeys:
-            thrown = play(monkey, part_b, mod)
+            thrown = monkey_play(monkey, part_b, mod)
 
             for throw_to_monkey, item_worry in thrown:
                 monkeys[throw_to_monkey].items.append(item_worry)
 
-    *_, second_busiest_monkey, busiest_monkey = sorted([m.inspections for m in monkeys])
-    return second_busiest_monkey * busiest_monkey
+    return math.prod(sorted([m.inspections for m in monkeys])[-2:])
 
 
 puzzle.answer_a = solve(20, False)
