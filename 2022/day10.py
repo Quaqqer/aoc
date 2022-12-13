@@ -12,7 +12,7 @@ x = 1
 ans_a = 0
 pixels = [[] for _ in range(7)]
 # The first line gets a bit wonky, works good enough
-pixels[0].extend([" ", " "])
+pixels[0].extend([" ", "#"])
 
 
 def maybe_add_score():
