@@ -43,14 +43,6 @@ puzzle.answer_a = sum(
 )
 
 
-class Packet:
-    def __init__(self, line):
-        self.data = eval(line)
-
-    def __lt__(self, other):
-        return compare(self.data, other.data) == True
-
-
 sorted_packets = sorted(
     [eval(line) for line in id.splitlines() if line] + [[[2]], [[6]]],
     key=functools.cmp_to_key(lambda l, r: compare(r, l)),
