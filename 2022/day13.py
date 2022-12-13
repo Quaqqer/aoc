@@ -46,9 +46,6 @@ def compare(left, right) -> None | bool:
             else:
                 return head_comparison
 
-        case _, _:
-            raise Exception("Unreachable")
-
 
 puzzle.answer_a = sum(i + 1 for i, (l, r) in enumerate(to_compare) if compare(l, r))
 
