@@ -1,8 +1,10 @@
 # 13   00:40:42   2810      0   00:51:38   2694      0
 # Pretty slow today, got stuck on equal comparisons between lists
 
+import functools
 import math
 
+import numpy as np
 from aocd.models import Puzzle
 
 puzzle = Puzzle(2022, int("13"))
@@ -15,39 +17,30 @@ to_compare = [
 ]
 
 
-def compare(left, right) -> None | bool:
+def compare(left, right) -> int:
     match left, right:
         case int(l), int(r):
-            if l == r:
-                return None
-            else:
-                return l < r
-
+            return np.sign(r - l)
         case int(l), list(r):
             return compare([l], r)
-
         case list(l), int(r):
             return compare(l, [r])
-
         case [], []:
-            return None
-
+            return 0
         case [], [rhead, *rtail]:
-            return True
-
+            return 1
         case [lhead, *ltail], []:
-            return False
-
+            return -1
         case [lhead, *ltail], [rhead, *rtail]:
             head_comparison = compare(lhead, rhead)
-
-            if head_comparison is None:
-                return compare(ltail, rtail)
-            else:
-                return head_comparison
+            return compare(ltail, rtail) if head_comparison == 0 else head_comparison
+        case _, _:
+            raise Exception("Unreachable")
 
 
-puzzle.answer_a = sum(i + 1 for i, (l, r) in enumerate(to_compare) if compare(l, r))
+puzzle.answer_a = sum(
+    i + 1 for i, (l, r) in enumerate(to_compare) if compare(l, r) == 1
+)
 
 
 class Packet:
@@ -58,7 +51,9 @@ class Packet:
         return compare(self.data, other.data) == True
 
 
-find_packets = [Packet("[[2]]"), Packet("[[6]]")]
-all_packets = [Packet(line) for line in id.splitlines() if line] + find_packets
-sorted_packets = sorted(all_packets)
-puzzle.answer_b = math.prod(sorted_packets.index(p) + 1 for p in find_packets)
+sorted_packets = sorted(
+    [eval(line) for line in id.splitlines() if line] + [[[2]], [[6]]],
+    key=functools.cmp_to_key(lambda l, r: compare(r, l)),
+)
+
+puzzle.answer_b = math.prod(sorted_packets.index(p) + 1 for p in [[[2]], [[6]]])
