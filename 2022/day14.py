@@ -3,7 +3,6 @@
 
 import numpy as np
 from aocd.models import Puzzle
-import lib
 
 puzzle = Puzzle(2022, int("14"))
 id = puzzle.input_data
