@@ -1,8 +1,6 @@
 # 15   00:30:05   1465      0   02:29:12   4089      0
 # Part 2 took so long because I forgot to parse negative numbers... Kill me please
 
-import re
-
 from aocd.models import Puzzle
 
 import lib
@@ -10,15 +8,15 @@ import lib
 puzzle = Puzzle(2022, int("15"))
 id = puzzle.input_data
 
-point = tuple[int, int]
+Point = tuple[int, int]
 
-sbds: list[tuple[point, point, int]] = []
+sbds: list[tuple[Point, Point, int]] = []
 for line in id.splitlines():
-    sensor_x, sensor_y, beacon_x, beacon_y = lib.all_ints(line)
-    sensor = sensor_x, sensor_y
-    beacon = beacon_x, beacon_y
-    sbds.append((sensor, beacon, lib.grid.manhattan_distance(sensor, beacon)))
-sbds.sort(key=lambda e: e[2])
+    sx, sy, bx, by = lib.all_ints(line)
+    sensor = sx, sy
+    beacon = bx, by
+    range_ = lib.grid.manhattan(sensor, beacon)
+    sbds.append((sensor, beacon, range_))
 
 
 def ans_a():
@@ -31,43 +29,33 @@ def ans_a():
             visible_line |= {sensor[0] + dx, sensor[0] - dx}
 
     sensors, beacons, _ = lib.unzip(sbds)
-    length = len(visible_line - set(p[0] for p in sensors + beacons if p[1] == line))
-    return length
+    exclude = set(p[0] for p in sensors + beacons if p[1] == line)
+    return len(visible_line - exclude)
 
 
-def diamond(sensor: point, range_: int) -> set[point]:
-    maxxy = 4000000
-
-    points = set()
-    sx, sy = sensor
-
-    drange = range_ + 1
-
-    for dx in range(-drange, drange + 1):
-        for dy in [drange - abs(dx), -(drange - abs(dx))]:
-            x, y = sx + dx, sy + dy
-            if 0 <= x < maxxy and 0 <= y < maxxy:
-                points.add((sx + dx, sy + dy))
-
-    return points
-
-
-def prune(points: set[point]):
-    for sensor, _, range_ in sbds[::-1]:
-        for point in points.copy():
-            dist = lib.grid.manhattan_distance(point, sensor)
-            if dist <= range_:
-                points.remove(point)
-
-
-def ans_b():
+def ans_b() -> int | None:
     for sensor, _, range_ in sbds:
-        possibilities = diamond(sensor, range_)
-        prune(possibilities)
+        maxxy = 4000000
 
-        if possibilities:
-            x, y = possibilities.pop()
-            return x * 4000000 + y
+        sx, sy = sensor
+        outer = range_ + 1
+
+        for dx in range(-outer, outer + 1):
+            for dy in [outer - abs(dx), -(outer - abs(dx))]:
+                x, y = sx + dx, sy + dy
+                if (
+                    0 <= x < maxxy
+                    and 0 <= y < maxxy
+                    and all(
+                        out_of_range((x, y), sensor, range_)
+                        for sensor, _, range_ in sbds
+                    )
+                ):
+                    return x * maxxy + y
+
+
+def out_of_range(point: Point, sensor: Point, range_: int):
+    return range_ < lib.grid.manhattan(point, sensor)
 
 
 puzzle.answer_a = ans_a()

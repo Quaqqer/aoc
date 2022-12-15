@@ -61,7 +61,7 @@ def print_grid(grid: Sequence[Sequence[str | int]], transpose=False):
             print()
 
 
-def manhattan_distance(point1: tuple[int, int], point2: tuple[int, int]):
+def manhattan(point1: tuple[int, int], point2: tuple[int, int]):
     x1, y1 = point1
     x2, y2 = point2
     return abs(x1 - x2) + abs(y1 - y2)
