@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import re
 from typing import Generator as _Generator
 from typing import TypeVar as _TypeVar
 
@@ -26,3 +27,12 @@ def sign(x: int) -> int:
 
 def unzip(x):
     return zip(*x)
+
+
+def all_ints(s: str) -> list[int]:
+    return list(map(int, re.findall(r"-?\d+", s)))
+
+
+def all_floats(s: str) -> list[float]:
+    """Expects format of 0.0, not .0 or 0."""
+    return list(map(float, re.findall(r"-?\d+\.\d+", s)))
