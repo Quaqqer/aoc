@@ -1,4 +1,4 @@
-from typing import Iterable, Sequence
+from typing import Sequence
 
 import lib
 
@@ -23,17 +23,24 @@ def neighbours8(pos: tuple[int, int]) -> list[tuple[int, int]]:
     ]
 
 
-def print_set_grid(grid: set[tuple[int, int]] | dict[tuple[int, int], str | int]):
+def print_set_grid(
+    grid: set[tuple[int, int]] | dict[tuple[int, int], str | int],
+    empty: str = ".",
+    min_x: int | None = None,
+    min_y: int | None = None,
+    max_x: int | None = None,
+    max_y: int | None = None,
+):
     xs, ys = lib.unzip(grid)
-    min_x = min(xs)
-    max_x = max(xs)
-    min_y = min(ys)
-    max_y = max(ys)
+    min_x = min(xs) if min_x is None else min_x - 1
+    max_x = max(xs) if max_x is None else max_x - 1
+    min_y = min(ys) if min_y is None else min_y - 1
+    max_y = max(ys) if max_y is None else max_y - 1
 
     get = (
-        (lambda k: "#" if k in grid else ".")
+        (lambda k: "#" if k in grid else empty)
         if isinstance(grid, set)
-        else (lambda k: str(grid.get((k, " "))))  # type: ignore
+        else (lambda k: str(grid.get(k, empty)))  # type: ignore
     )
 
     for y in range(min_y, max_y + 1):
