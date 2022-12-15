@@ -1,7 +1,7 @@
 # 14   00:20:17    646      0   00:23:17    543      0
 # pretty good today
 
-import numpy as np
+import lib
 from aocd.models import Puzzle
 
 puzzle = Puzzle(2022, int("14"))
@@ -21,8 +21,8 @@ def fill_rocks(input_data: str) -> tuple[set[tuple[int, int]], int]:
         rocks_and_sand.add((x, y))
         for newx, newy in coords[1:]:
             while x != newx or y != newy:
-                x += np.sign(newx - x)
-                y += np.sign(newy - y)
+                x += lib.sign(newx - x)
+                y += lib.sign(newy - y)
 
                 rocks_and_sand.add((x, y))
                 maxy = max(maxy, y)
