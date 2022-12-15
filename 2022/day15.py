@@ -5,29 +5,39 @@ import re
 
 from aocd.models import Puzzle
 
+import lib
+
 puzzle = Puzzle(2022, int("15"))
 id = puzzle.input_data
 
+point = tuple[int, int]
 
-def manhattan_distance(pos1, pos2):
-    x1, y1 = pos1
-    x2, y2 = pos2
-    return abs(x1 - x2) + abs(y1 - y2)
-
-
-sensors = {}
+sbds: list[tuple[point, point, int]] = []
 for line in id.splitlines():
-    sensor_x, sensor_y, beacon_x, beacon_y = map(int, re.findall(r"-?\d+", line))
-    sensors[sensor_x, sensor_y] = beacon_x, beacon_y
-
-sensor_beacons = list(sensors.items())
-sensor_beacons.sort(key=lambda x: manhattan_distance(*x))
-
-
-maxxy = 4000000
+    sensor_x, sensor_y, beacon_x, beacon_y = lib.all_ints(line)
+    sensor = sensor_x, sensor_y
+    beacon = beacon_x, beacon_y
+    sbds.append((sensor, beacon, lib.grid.manhattan_distance(sensor, beacon)))
+sbds.sort(key=lambda e: e[2])
 
 
-def edge(sensor, range_):
+def ans_a():
+    line = 2000000
+
+    visible_line: set[int] = set()
+    for sensor, _, range_ in sbds:
+        dy = abs(sensor[1] - line)
+        for dx in range(range_ - dy + 1):
+            visible_line |= {sensor[0] + dx, sensor[0] - dx}
+
+    sensors, beacons, _ = lib.unzip(sbds)
+    length = len(visible_line - set(p[0] for p in sensors + beacons if p[1] == line))
+    return length
+
+
+def diamond(sensor: point, range_: int) -> set[point]:
+    maxxy = 4000000
+
     points = set()
     sx, sy = sensor
 
@@ -42,27 +52,23 @@ def edge(sensor, range_):
     return points
 
 
-def prune(points):
-    for sensor, beacon in sensor_beacons[::-1]:
-        range_ = manhattan_distance(sensor, beacon)
-
-        if not points:
-            return
-
+def prune(points: set[point]):
+    for sensor, _, range_ in sbds[::-1]:
         for point in points.copy():
-            dist = manhattan_distance(point, sensor)
+            dist = lib.grid.manhattan_distance(point, sensor)
             if dist <= range_:
                 points.remove(point)
 
 
 def ans_b():
-    for sensor, beacon in sensor_beacons:
-        range_ = manhattan_distance(sensor, beacon)
-        diamond = edge(sensor, range_)
-        prune(diamond)
-        if len(diamond) == 1:
-            x, y = diamond.pop()
+    for sensor, _, range_ in sbds:
+        possibilities = diamond(sensor, range_)
+        prune(possibilities)
+
+        if possibilities:
+            x, y = possibilities.pop()
             return x * 4000000 + y
 
 
+puzzle.answer_a = ans_a()
 puzzle.answer_b = ans_b()

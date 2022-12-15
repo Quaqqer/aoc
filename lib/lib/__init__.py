@@ -4,6 +4,8 @@ import re
 from typing import Generator as _Generator
 from typing import TypeVar as _TypeVar
 
+from . import grid
+
 _T = _TypeVar("_T")
 
 
