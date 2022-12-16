@@ -1,4 +1,7 @@
-#!/usr/bin/env python3
+# 16   01:36:48   1397      0   02:06:19    551      0
+# Pretty hard problem today, went well though. Overslept by 30 minutes, gotta get my
+# sleep in order...
+
 import re
 from heapq import heappop, heappush
 
