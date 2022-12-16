@@ -1,6 +1,6 @@
 # 16   01:36:48   1397      0   02:06:19    551      0
-# Pretty hard problem today, went well though. Overslept by 30 minutes, gotta get my
-# sleep in order...
+# Pretty hard problem today, went well though. Overslept by 30 minutes, gotta
+# get my sleep in order...
 
 import re
 from heapq import heappop, heappush
@@ -9,38 +9,28 @@ from aocd.models import Puzzle
 
 puzzle = Puzzle(2022, int("16"))
 id = puzzle.input_data
-# id = """Valve AA has flow rate=0; tunnels lead to valves DD, II, BB
-# Valve BB has flow rate=13; tunnels lead to valves CC, AA
-# Valve CC has flow rate=2; tunnels lead to valves DD, BB
-# Valve DD has flow rate=20; tunnels lead to valves CC, AA, EE
-# Valve EE has flow rate=3; tunnels lead to valves FF, DD
-# Valve FF has flow rate=0; tunnels lead to valves EE, GG
-# Valve GG has flow rate=0; tunnels lead to valves FF, HH
-# Valve HH has flow rate=22; tunnel leads to valve GG
-# Valve II has flow rate=0; tunnels lead to valves AA, JJ
-# Valve JJ has flow rate=21; tunnel leads to valve II"""
 
 
-valves = dict()
+valves: dict[str, tuple[int, str]] = {}
 for line in id.splitlines():
     valve, flow_rate, leads_to = re.match(
         r"Valve (.*) has flow rate=(-?\d+); tunnels? leads? to valves? (.*)", line
-    ).groups()
-    flow_rate = int(flow_rate)
-    leads_to = leads_to.split(", ")
-    valves[valve] = (flow_rate, leads_to)
+    ).groups()  # type: ignore
+    valves[valve] = (int(flow_rate), leads_to.split(", "))  # type: ignore
 
 
 non_empty = sum(flow_rate > 0 for flow_rate, _ in valves.values())
 
 
-moves = []
-
-
-def bfs(from_):
-    queue = [(from_, 0)]
-    visited = {from_}
-    possible_moves = []
+def bfs_moves(from_) -> list[tuple[int, int, str]]:
+    """
+    Find moves from a position, this is way better than doing one thing in each
+    dijkstra search step, like turning on a valve and moving one step to each
+    cave. This way we can do it all in one step.
+    """
+    queue: list[tuple[str, int]] = [(from_, 0)]
+    visited: set[str] = {from_}
+    possible_moves: list[tuple[int, int, str]] = []
 
     while queue:
         curr, time = queue.pop(0)
@@ -58,15 +48,14 @@ def bfs(from_):
     return possible_moves
 
 
-moves = {}
-
-for from_, (flow, _) in valves.items():
-    if flow > 0 or from_ == "AA":
-        to = bfs(from_)
-        moves[from_] = to
+# Construct moves
+moves = {from_: bfs_moves(from_) for from_, _ in valves.items()}
 
 
-def dijkstra(start):
+def part_a(start="AA"):
+    """
+    Dijjkstra search for the best time.
+    """
     queue = [(0, start, set(), 0)]
 
     best = 0
@@ -92,8 +81,7 @@ def dijkstra(start):
     return best
 
 
-def dijkstra2(start):
-    i = 0
+def part_b(start="AA"):
     queue = [(0, 0, start, 0, start, set(), 0)]
 
     best = 0
@@ -108,10 +96,6 @@ def dijkstra2(start):
             opened,
             released,
         ) = heappop(queue)
-
-        if i % 10000 == 0:
-            print(time)
-        i += 1
 
         best = max(best, released)
         # We can probably prune this, lol
@@ -165,11 +149,6 @@ def dijkstra2(start):
     return best
 
 
-ans_a = dijkstra("AA")
-print(ans_a)
+puzzle.answer_a = part_a()
 
-puzzle.answer_a = ans_a
-
-ans_b = dijkstra2("AA")
-print(ans_b)
-puzzle.answer_b = ans_b
+puzzle.answer_b = part_b()
