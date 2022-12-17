@@ -1,13 +1,15 @@
-from typing import Sequence
+from typing import Sequence as _Sequence
 
 import lib
 
+point = tuple[int, int]
 
-def neighbours4(pos: tuple[int, int]) -> list[tuple[int, int]]:
+
+def neighbours4(pos: point) -> list[point]:
     return [lib.tup_add(pos, d) for d in [(0, -1), (0, 1), (-1, 0), (1, 0)]]
 
 
-def neighbours8(pos: tuple[int, int]) -> list[tuple[int, int]]:
+def neighbours8(pos: point) -> list[point]:
     return [
         lib.tup_add(pos, d)
         for d in [
@@ -24,7 +26,7 @@ def neighbours8(pos: tuple[int, int]) -> list[tuple[int, int]]:
 
 
 def print_set_grid(
-    grid: set[tuple[int, int]] | dict[tuple[int, int], str | int],
+    grid: set[point] | dict[point, str | int],
     empty: str = ".",
     min_x: int | None = None,
     min_y: int | None = None,
@@ -50,7 +52,7 @@ def print_set_grid(
         print(line)
 
 
-def print_grid(grid: Sequence[Sequence[str | int]], transpose=False):
+def print_grid(grid: _Sequence[_Sequence[str | int]], transpose=False):
     if not transpose:
         for line in grid:
             print("".join(map(str, line)))
@@ -61,7 +63,7 @@ def print_grid(grid: Sequence[Sequence[str | int]], transpose=False):
             print()
 
 
-def manhattan(point1: tuple[int, int], point2: tuple[int, int]):
+def manhattan(point1: point, point2: point) -> int:
     x1, y1 = point1
     x2, y2 = point2
     return abs(x1 - x2) + abs(y1 - y2)
