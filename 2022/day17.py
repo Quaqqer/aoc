@@ -1,4 +1,7 @@
-#!/usr/bin/env python3
+# 17   00:47:50    880      0   02:47:11   1718      0
+# not the best times, I was pretty braindead
+# modulus is kinda sus tbh
+
 import time
 
 from aocd.models import Puzzle
