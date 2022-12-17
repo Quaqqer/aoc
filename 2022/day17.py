@@ -10,17 +10,29 @@ import lib
 
 puzzle = Puzzle(2022, int("17"))
 
-shifts = puzzle.input_data
+shifts = [1 if c == ">" else -1 for c in puzzle.input_data]
 
-shift_i = 0
-
+# fmt: off
 rocks = [
     ["####"],
-    [" # ", "###", " # "],
-    ["  #", "  #", "###"],
-    ["#", "#", "#", "#"],
-    ["##", "##"],
+
+    [" # ",
+     "###",
+     " # "],
+
+    ["  #",
+     "  #",
+     "###"],
+
+    ["#",
+     "#",
+     "#",
+     "#"],
+
+    ["##",
+     "##"],
 ]
+# fmt: on
 
 
 def touches_dropped(
@@ -53,17 +65,11 @@ def insert_dropped(
     return new, maxh
 
 
-def shift() -> str:
-    global shift_i
-    v = shifts[shift_i]
-    shift_i = (shift_i + 1) % len(shifts)
-    return v
-
-
 dropped = set((x, 0) for x in range(7))  # Initially the floor
 height = 0  # Negative height, because coordinate systems
 firsts = {}  #
 
+shift_i = 0
 drop_i = 0
 while drop_i < 1000000000000:
     # Get the current rock to drop
@@ -77,20 +83,23 @@ while drop_i < 1000000000000:
     rockx = 2
     rocky = height - 3
 
-    # Move rock, first shift it and then try to move down
+    # Move rock until it collides on the way down
     while True:
-        if shift() == "<":
-            if 0 < rockx:
-                if not touches_dropped(dropped, rock, rockx - 1, rocky):
-                    rockx -= 1
-        else:
-            if rockx < 7 - rwidth:
-                if not touches_dropped(dropped, rock, rockx + 1, rocky):
-                    rockx += 1
+        # Try to shift it sideways
+        shift = shifts[shift_i]
+        next_rockx = rockx + shift
+        if 0 <= next_rockx <= 7 - rwidth and not touches_dropped(
+            dropped, rock, next_rockx, rocky
+        ):
+            rockx = next_rockx
+        shift_i = (shift_i + 1) % len(shifts)
 
         if touches_dropped(dropped, rock, rockx, rocky + 1):
+            # It will collide when moving down, break
             break
-        rocky += 1
+        else:
+            # Move down
+            rocky += 1
 
     # Insert the rock into the dropped set and update height
     dropped_rock, mheight = insert_dropped(rock, rockx, rocky)
