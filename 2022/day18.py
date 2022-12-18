@@ -43,10 +43,6 @@ print(cubes)
 print(min(xs), max(xs), min(ys), max(ys), min(zs), max(zs))
 
 
-def flood_droplet(droplet: set[lib.grid.point]):
-    pass
-
-
 def is_surface(c) -> bool:
     if c in surrounded:
         return False
