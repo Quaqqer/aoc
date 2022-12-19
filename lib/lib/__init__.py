@@ -13,6 +13,18 @@ def tup_add(t1, t2):
     return tuple(e1 + e2 for e1, e2 in zip(t1, t2))
 
 
+def tup_sub(t1, t2):
+    return tuple(e1 - e2 for e1, e2 in zip(t1, t2))
+
+
+def tup_mul(t1, t2):
+    return tuple(e1 * e2 for e1, e2 in zip(t1, t2))
+
+
+def tup_div(t1, t2):
+    return tuple(e1 / e2 for e1, e2 in zip(t1, t2))
+
+
 def windows(li: list[_T], size: int) -> _Generator[list[_T], None, None]:
     for i in range(len(li) - size):
         yield li[i : i + size]
