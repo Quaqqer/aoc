@@ -45,12 +45,8 @@ def find_inserter(elem, elems):
     curr = elem
 
     i = elem.val % (len(elems) - 1)
-    if i < 0:
-        for _ in range(-i + 1):
-            curr = curr.prev
-    else:
-        for _ in range(i):
-            curr = curr.next
+    for _ in range(i):
+        curr = curr.next
     return curr
 
 
