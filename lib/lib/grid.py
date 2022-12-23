@@ -34,9 +34,9 @@ def print_set_grid(
     max_y: int | None = None,
 ):
     xs, ys = lib.unzip(grid)
-    minx: int = min(xs) if min_x is None else min_x - 1
+    minx: int = min(xs) if min_x is None else min_x
     maxx: int = max(xs) if max_x is None else max_x - 1
-    miny: int = min(ys) if min_y is None else min_y - 1
+    miny: int = min(ys) if min_y is None else min_y
     maxy: int = max(ys) if max_y is None else max_y - 1
 
     get = (
