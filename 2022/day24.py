@@ -1,3 +1,6 @@
+# 24   00:38:47    496      0   00:57:38    773      0
+# solid problem, not too bad time
+
 import functools
 from collections import defaultdict
 from heapq import heappop, heappush
