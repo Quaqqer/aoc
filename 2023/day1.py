@@ -31,4 +31,4 @@ puzzle.answer_a = sum(solve_line(l, False) for l in data.splitlines())
 puzzle.answer_b = sum(solve_line(l, True) for l in data.splitlines())
 
 # puzzle.answer_a = sum(int(''.join((ds := [c for c in line if c.isdigit()], ds[0], ds[-1])[1:])) for line in data.splitlines()) # noqa
-# puzzle.answer_b = sum(int((ds := [v[0] for i in range(len(line)) if (v := [str(val % 10) for val, s in enumerate(['0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'zero', 'one', 'two', 'three', 'four', 'five', 'six', 'seven', 'eight', 'nine']) if line[i:].startswith(s)]) and len(v) == 1], ds[0] + ds[-1])[1]) for line in data.splitlines()) # noqa
+# puzzle.answer_b = sum(int((ds := [v[0] for i in range(len(line)) if (v := [str(val % 10) for val, s in enumerate('0,1,2,3,4,5,6,7,8,9,zero,one,two,three,four,five,six,seven,eight,nine'.split(',')) if line[i:].startswith(s)]) and len(v) == 1], ds[0] + ds[-1])[1]) for line in data.splitlines()) # noqa
