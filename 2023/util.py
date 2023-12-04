@@ -1,6 +1,16 @@
 from __future__ import annotations
 
-from typing import Any, Callable, Generator, Generic, TypeVar, overload
+import re
+from typing import (
+    Any,
+    Callable,
+    Generator,
+    Generic,
+    Iterable,
+    Sequence,
+    TypeVar,
+    overload,
+)
 
 T = TypeVar("T")
 U = TypeVar("U")
@@ -255,3 +265,82 @@ class Grid(Generic[T]):
     def values(self) -> Generator[T, Any, None]:
         for x, y in self.coords():
             yield self[x, y]
+
+
+def tup_op(
+    a: tuple[T, ...], b: tuple[T, ...], op: Callable[[T, T], T]
+) -> tuple[T, ...]:
+    return tuple(op(aa, bb) for aa, bb in zip(a, b))
+
+
+def tup_add(a: tuple[T, ...], b: tuple[T, ...]) -> tuple[T, ...]:
+    return tup_op(a, b, lambda aa, bb: aa + bb)  # type: ignore
+
+
+def tup_sub(a: tuple[T, ...], b: tuple[T, ...]) -> tuple[T, ...]:
+    return tup_op(a, b, lambda aa, bb: aa - bb)  # type: ignore
+
+
+def tup_mul(a: tuple[T, ...], b: tuple[T, ...]) -> tuple[T, ...]:
+    return tup_op(a, b, lambda aa, bb: aa * bb)  # type: ignore
+
+
+def tup_div(a: tuple[T, ...], b: tuple[T, ...]) -> tuple[T, ...]:
+    return tup_op(a, b, lambda aa, bb: aa / bb)  # type: ignore
+
+
+def tup_idiv(a: tuple[int, ...], b: tuple[int, ...]) -> tuple[int, ...]:
+    return tup_op(a, b, lambda aa, bb: aa // bb)
+
+
+def manhattan(a: tuple[int, int], b: tuple[int, int]) -> int:
+    ax, ay = a
+    bx, by = b
+    return abs(ax - bx) + abs(ay - by)
+
+
+def print_set_grid(
+    grid: set[tuple[int, int]] | dict[tuple[int, int], str | int],
+    empty: str = ".",
+    min_x: int | None = None,
+    min_y: int | None = None,
+    max_x: int | None = None,
+    max_y: int | None = None,
+):
+    xs, ys = zip(*grid)
+    minx: int = min(xs) if min_x is None else min_x
+    maxx: int = max(xs) if max_x is None else max_x - 1
+    miny: int = min(ys) if min_y is None else min_y
+    maxy: int = max(ys) if max_y is None else max_y - 1
+
+    get = (
+        (lambda k: "#" if k in grid else empty)
+        if isinstance(grid, set)
+        else (lambda k: str(grid.get(k, empty)))  # type: ignore
+    )
+
+    for y in range(miny, maxy + 1):
+        line = ""
+        for x in range(minx, maxx + 1):
+            line += get((x, y))
+        print(line)
+
+
+def print_grid(grid: Sequence[Sequence[str | int]], transpose=False):
+    if not transpose:
+        for line in grid:
+            print("".join(map(str, line)))
+    else:
+        for y in range(len(grid[0])):
+            for x in range(len(grid)):
+                print(grid[x][y], end="")
+            print()
+
+
+def ints(src: str | Iterable[str]) -> list[int]:
+    match src:
+        case str(s):
+            return list(map(int, re.findall(r"\d+", s)))
+        case src:
+            assert hasattr(src, "__iter__")
+            return list(map(int, src))
