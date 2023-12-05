@@ -13,7 +13,6 @@ def scratch(winning: set[int], yours: list[int]) -> int:
 
 cards: list[tuple[set[int], list[int]]] = []
 cards_amt = [1 for _ in range(len(lines))]
-cards_amt[0] = 1
 
 for line in lines:
     winning, yours = line.split(": ")[1].split("|")
