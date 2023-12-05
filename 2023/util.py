@@ -344,3 +344,25 @@ def ints(src: str | Iterable[str]) -> list[int]:
         case src:
             assert hasattr(src, "__iter__")
             return list(map(int, src))
+
+
+class Range:
+    """Range [start, end)"""
+
+    def __init__(self, start: int, end: int):
+        assert start < end
+        self.start = start
+        self.end = end
+
+    def overlap(self, other: Range) -> Range | None:
+        ostart = max(self.start, other.start)
+        oend = min(self.end, other.end)
+
+        if ostart < oend:
+            return Range(ostart, oend)
+
+    def __add__(self, v: int) -> Range:
+        return Range(self.start + v, self.end + v)
+
+    def __repr__(self) -> str:
+        return f"[{self.start}, {self.end})"
