@@ -1,56 +1,76 @@
-from aocd.models import Puzzle
+from __future__ import annotations
 
-from util import *
+from aocd.models import Puzzle
 
 puzzle = Puzzle(2023, int("05"))
 data = puzzle.input_data
 
+
+class Range:
+    """Range [start, end)"""
+
+    def __init__(self, start: int, end: int):
+        assert start < end
+        self.start = start
+        self.end = end
+
+    def overlap(self, other: Range) -> Range | None:
+        ostart = max(self.start, other.start)
+        oend = min(self.end, other.end)
+
+        if ostart < oend:
+            return Range(ostart, oend)
+
+    def __add__(self, v: int) -> Range:
+        return Range(self.start + v, self.end + v)
+
+    def __repr__(self) -> str:
+        return f"[{self.start}, {self.end})"
+
+
 seeds, *mapss = data.split("\n\n")
 seeds = list(map(int, seeds.split(": ")[1].split()))
-maps: list[list[tuple[int, int, int]]] = []
+maps: list[list[tuple[int, Range]]] = []
 for i, m in enumerate((m.splitlines()[1:] for m in mapss)):
     maps.append([])
+
     for l in m:
-        dest, src, rang = map(int, l.split())
-        maps[i].append((dest, src, src + rang - 1))
+        dest, start, length = map(int, l.split())
+        maps[i].append((dest, Range(start, start + length)))
 
-    maps[i].sort(key=lambda v: v[1])
+    maps[i].sort(key=lambda v: v[1].start)
 
 
-def overlaps(m: int, r: tuple[int, int]) -> list[tuple[int, int]]:
+def overlaps(m: int, r: Range) -> list[Range]:
+    """Recursively find overlaps for ranges in the maps."""
     if m == len(maps):
         return [r]
 
-    start, end = r
+    rs = []
+    last_end = r.start
+    for dest, r2 in maps[m]:
+        overlap = r.overlap(r2)
 
-    os = []
-    last_end = r[0]
-    for dest, mstart, mend in maps[m]:
-        ostart, oend = max(start, mstart), min(end, mend)
+        if overlap:
+            if last_end < overlap.start:
+                rs += overlaps(m + 1, Range(last_end, overlap.start))
 
-        if start <= ostart and oend <= end and ostart <= oend:
-            if last_end < ostart - 1:
-                os += overlaps(m + 1, (last_end, ostart - 1))
+            delta = dest - r2.start
+            dest_range = overlap + delta
+            rs += overlaps(m + 1, dest_range)
+            last_end = overlap.end
 
-            delta = dest - mstart
-            dstart = ostart + delta
-            dend = oend + delta
-            last_end = oend + 1
-            os += overlaps(m + 1, (dstart, dend))
+    if last_end < r.end:
+        rs += overlaps(m + 1, Range(last_end, r.end))
 
-    if last_end <= r[1]:
-        os += overlaps(m + 1, (last_end, r[1]))
-
-    return os
+    return rs
 
 
-def best_answer(ranges: Iterable[tuple[int, int]]):
-    return min(
-        list(zip(*(o for start, end in ranges for o in overlaps(0, (start, end)))))[0]
-    )
-
-
-puzzle.answer_a = best_answer((seed, seed) for seed in seeds)
-puzzle.answer_b = best_answer(
-    (start, start + rang - 1) for start, rang in zip(seeds[0::2], seeds[1::2])
+puzzle.answer_a = min(
+    overlap.start for seed in seeds for overlap in overlaps(0, Range(seed, seed + 1))
+)
+puzzle.answer_b = min(
+    overlap.start
+    for start, length in zip(seeds[0::2], seeds[1::2])
+    for overlap in overlaps(0, Range(start, start + length))
 )
