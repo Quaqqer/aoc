@@ -1,6 +1,7 @@
 #   7   00:52:46  5903      0   00:59:18  3613      0
 # overslept and sleep deprivation, typical :/
 
+from collections import defaultdict
 from functools import cmp_to_key
 
 from aocd.models import Puzzle
@@ -17,44 +18,29 @@ def c_vals(h: str) -> tuple[int, ...]:
     return tuple(cards.find(c) for c in hand)
 
 
-def type(hand: str) -> int:
-    for card in cards:
-        if len([c for c in hand if c == card]) == 5:
-            return 7
+def type1(hand: str) -> int:
+    counts = defaultdict(int)
 
-    for card in cards:
-        if len([c for c in hand if c == card]) == 4:
-            return 6
+    for c in hand:
+        counts[c] += 1
 
-    for card1 in cards:
-        for card2 in cards:
-            if card1 == card2:
-                continue
+    if 5 in counts.values():
+        return 6
 
-            if (
-                len([c for c in hand if c == card1]) == 3
-                and len([c for c in hand if c == card2]) == 2
-            ):
-                return 5
+    if 4 in counts.values():
+        return 5
 
-    for card in cards:
-        if len([c for c in hand if c == card]) == 3:
-            return 4
+    if 3 in counts.values() and 2 in counts.values():
+        return 4
 
-    for card1 in cards:
-        for card2 in cards:
-            if card1 == card2:
-                continue
+    if 3 in counts.values():
+        return 3
 
-            if (
-                len([c for c in hand if c == card1]) == 2
-                and len([c for c in hand if c == card2]) == 2
-            ):
-                return 2
+    if sum(1 for count in counts.values() if count == 2) == 2:
+        return 2
 
-    for card in cards:
-        if len([c for c in hand if c == card]) == 2:
-            return 1
+    if 2 in counts.values():
+        return 1
 
     return 0
 
@@ -133,8 +119,8 @@ def type2(hand: str) -> int:
     return 0
 
 
-def rank(hand: str) -> tuple[int, ...]:
-    return (type(hand),) + tuple(cards.find(c) for c in hand)
+def rank1(hand: str) -> tuple[int, ...]:
+    return (type1(hand),) + tuple(cards.find(c) for c in hand)
 
 
 def rank2(hand: str) -> tuple[int, ...]:
@@ -147,9 +133,9 @@ for line in lines:
     vs.append((hand, int(score)))
 
 
-def cmp(a, b):
-    ar = rank(a[0])
-    br = rank(b[0])
+def cmp1(a, b):
+    ar = rank1(a[0])
+    br = rank1(b[0])
 
     if ar < br:
         return -1
@@ -172,7 +158,7 @@ def cmp2(a, b):
 
 
 puzzle.answer_a = sum(
-    (i + 1) * v for i, (_, v) in enumerate(sorted(vs, key=cmp_to_key(cmp)))
+    (i + 1) * v for i, (_, v) in enumerate(sorted(vs, key=cmp_to_key(cmp1)))
 )
 puzzle.answer_b = sum(
     (i + 1) * v for i, (_, v) in enumerate(sorted(vs, key=cmp_to_key(cmp2)))
