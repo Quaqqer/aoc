@@ -340,7 +340,7 @@ def print_grid(grid: Sequence[Sequence[str | int]], transpose=False):
 def ints(src: str | Iterable[str]) -> list[int]:
     match src:
         case str(s):
-            return list(map(int, re.findall(r"\d+", s)))
+            return list(map(int, re.findall(r"[+-]?\d+", s)))
         case src:
             assert hasattr(src, "__iter__")
             return list(map(int, src))
