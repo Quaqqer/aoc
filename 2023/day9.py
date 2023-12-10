@@ -22,17 +22,14 @@ def solve_a(line: str, p2: bool) -> int:
             new_row.append(b - a)
         rows.append(new_row)
 
-    for i in range(len(rows))[::-1]:
-        if i == len(rows) - 1:
-            rows[i] = [0] + rows[i] if p2 else rows[i] + [0]
-        else:
-            rows[i] = (
-                [-rows[i + 1][0] + rows[i][0]] + rows[i]
-                if p2
-                else rows[i] + [rows[i + 1][-1] + rows[i][-1]]
-            )
+    if not p2:
+        return sum(row[-1] for row in rows)
 
-    return rows[0][0] if p2 else rows[0][-1]
+    rows[-1] = [0] + rows[-1]
+    for i in range(len(rows) - 1)[::-1]:
+        rows[i] = [-rows[i + 1][0] + rows[i][0]] + rows[i]
+
+    return rows[0][0]
 
 
 puzzle.answer_a = sum(solve_a(line, False) for line in lines)

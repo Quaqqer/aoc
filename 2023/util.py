@@ -8,12 +8,15 @@ from typing import (
     Generic,
     Iterable,
     Sequence,
+    TypeAlias,
     TypeVar,
     overload,
 )
 
 T = TypeVar("T")
 U = TypeVar("U")
+
+Coord: TypeAlias = "tuple[int, int]"
 
 
 class Grid(Generic[T]):
@@ -105,13 +108,13 @@ class Grid(Generic[T]):
             return [self.get(x, yy) for yy in range(y.start, y.stop, y.step)]
         else:
             assert isinstance(x, slice) and isinstance(y, slice)
-            cols = x.start - x.stop - 1
-            rows = y.start - y.stop - 1
+            cols = x.stop - x.start
+            rows = y.stop - y.start
             return Grid(
                 cols,
                 rows,
                 [
-                    [self.get(xx, yy) for xx in range(x.start, x.stop.x.step)]
+                    [self.get(xx, yy) for xx in range(x.start, x.stop, x.step)]
                     for yy in range(y.start, y.stop, y.step)
                 ],
             )
@@ -231,7 +234,7 @@ class Grid(Generic[T]):
     ) -> Generator[tuple[int, int], Any, None]:
         x, y = coord
 
-        for dx, dy in [(-1, 0), (0, -1), (1, 0), (-1, 0)]:
+        for dx, dy in [(0, 1), (0, -1), (1, 0), (-1, 0)]:
             if dx == dy == 0:
                 continue
 
@@ -366,3 +369,7 @@ class Range:
 
     def __repr__(self) -> str:
         return f"[{self.start}, {self.end})"
+
+
+def unindent(s: str) -> str:
+    return "\n".join(l.lstrip() for l in s.splitlines())
