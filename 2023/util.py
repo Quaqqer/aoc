@@ -373,3 +373,7 @@ class Range:
 
 def unindent(s: str) -> str:
     return "\n".join(l.lstrip() for l in s.splitlines())
+
+
+def transpose(a):
+    return list(zip(*a))
