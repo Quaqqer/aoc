@@ -21,18 +21,19 @@ def solve(lines: list[str]) -> int:
 
         @functools.cache
         def damaged(i: int, g: int) -> int:
-            if g >= len(gs):
+            if g == len(gs):
                 return 1 if all(c != "#" for c in a[i:]) else 0
 
             s = 0
             for j in range(i, len(a)):
-                ss = a[j : j + gs[g]]
+                start = j
+                end = j + gs[g]
                 if (
-                    len(ss) == gs[g]
-                    and all(c != "." for c in ss)
-                    and (len(a) <= j + gs[g] or a[j + gs[g]] != "#")
+                    end <= len(a)
+                    and all(c != "." for c in a[start:end])
+                    and (end >= len(a) or a[end] != "#")
                 ):
-                    s += damaged(j + gs[g] + 1, g + 1)
+                    s += damaged(end + 1, g + 1)
 
                 if a[j] == "#":
                     break
