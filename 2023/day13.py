@@ -19,36 +19,21 @@ def reflection(l: Sequence[Sequence[str]], p2: bool) -> int | None:
         a = tuple(l[i - length : i])
         b = tuple(l[i : i + length])[::-1]
 
-        if p2:
-            # If there is only one differing character, we found a mirror
-            diffs = sum(
-                1 for j in range(len(a)) for ac, bc in zip(a[j], b[j]) if ac != bc
-            )
-            if diffs == 1:
-                return i
-        else:
-            # If they are equal we found a mirror
-            if a == b:
-                return i
+        diffs = sum(1 for j in range(len(a)) for ac, bc in zip(a[j], b[j]) if ac != bc)
+
+        if (p2 and diffs == 1) or (not p2 and diffs == 0):
+            return i
 
 
-asum = 0
-bsum = 0
-for g in grids:
-    for p2 in [False, True]:
-        hr = reflection(g, p2)
-        vr = reflection(transpose(g), p2)
+def solve(grids: list[list[str]], p2: bool) -> int:
+    s = 0
+    for g in grids:
+        if (hr := reflection(g, p2)) is not None:
+            s += 100 * hr
+        elif (vr := reflection(transpose(g), p2)) is not None:
+            s += vr
+    return s
 
-        if hr is not None:
-            s = 100 * hr
-        else:
-            assert vr is not None
-            s = vr
 
-        if p2:
-            bsum += s
-        else:
-            asum += s
-
-puzzle.answer_a = asum
-puzzle.answer_b = bsum
+puzzle.answer_a = solve(grids, False)
+puzzle.answer_b = solve(grids, True)
