@@ -375,5 +375,5 @@ def unindent(s: str) -> str:
     return "\n".join(l.lstrip() for l in s.splitlines())
 
 
-def transpose(a):
-    return list(zip(*a))
+def transpose(a: Sequence[Sequence[T]]) -> tuple[tuple[T, ...], ...]:
+    return tuple(zip(*a))
