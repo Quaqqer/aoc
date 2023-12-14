@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import re
+from copy import deepcopy
 from typing import (
     Any,
     Callable,
@@ -24,6 +25,9 @@ class Grid(Generic[T]):
         self._cols = cols
         self._rows = rows
         self._grid = _grid
+
+    def copy(self) -> Grid[T]:
+        return Grid(cols=self._cols, rows=self._rows, _grid=deepcopy(self._grid))
 
     def __repr__(self) -> str:
         is_strs = all(isinstance(self[x, y], str) for x, y in self.coords())
