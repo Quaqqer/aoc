@@ -1,8 +1,8 @@
 #   7   00:52:46  5903      0   00:59:18  3613      0
 # overslept and sleep deprivation, typical :/
 
-from collections import defaultdict
-from functools import cmp_to_key
+from collections import Counter
+from collections.abc import Callable
 
 from aocd.models import Puzzle
 
@@ -14,152 +14,44 @@ cards = "1234556789TJQKA"
 cards2 = "J1234556789TQKA"
 
 
-def c_vals(h: str) -> tuple[int, ...]:
-    return tuple(cards.find(c) for c in hand)
+def hand_type(hand: str, p2: bool) -> int:
+    counts = Counter(hand)
 
+    js = counts.pop("J") if p2 and "J" in counts else 0
 
-def type1(hand: str) -> int:
-    counts = defaultdict(int)
-
-    for c in hand:
-        counts[c] += 1
-
-    if 5 in counts.values():
-        return 6
-
-    if 4 in counts.values():
-        return 5
-
-    if 3 in counts.values() and 2 in counts.values():
-        return 4
-
-    if 3 in counts.values():
-        return 3
-
-    if sum(1 for count in counts.values() if count == 2) == 2:
-        return 2
-
-    if 2 in counts.values():
-        return 1
-
-    return 0
-
-
-def type2(hand: str) -> int:
-    for card in cards:
-        if len([c for c in hand if c == card or c == "J"]) == 5:
-            return 7
-
-    for card in cards:
-        if len([c for c in hand if c == card or c == "J"]) == 4:
+    match sorted(counts.values(), reverse=True) + [0, 0]:
+        case [x, *_] if x + js == 5:
             return 6
-
-    for card1 in cards:
-        for card2 in cards:
-            if card1 == card2:
-                continue
-
-            c1s = []
-            for i, c in enumerate(hand):
-                if c == card1 or c == "J":
-                    c1s.append(i)
-
-                if len(c1s) == 3:
-                    break
-
-            c2s = []
-            for i, c in enumerate(hand):
-                if i in c1s:
-                    continue
-
-                if c == card2 or c == "J":
-                    c2s.append(i)
-
-                if len(c2s) == 2:
-                    break
-
-            if len(c1s) == 3 and len(c2s) == 2:
-                return 5
-
-    for card in cards:
-        if len([c for c in hand if c == card or c == "J"]) == 3:
+        case [x, *_] if x + js == 4:
+            return 5
+        case [x, y, *_] if x + js >= 3 and y + js >= 2 and x + y + js >= 5:
             return 4
-
-    for card1 in cards:
-        for card2 in cards:
-            if card1 == card2:
-                continue
-
-            c1s = []
-            for i, c in enumerate(hand):
-                if c == card1 or c == "J":
-                    c1s.append(i)
-
-                if len(c1s) == 2:
-                    break
-
-            c2s = []
-            for i, c in enumerate(hand):
-                if i in c1s:
-                    continue
-
-                if c == card2 or c == "J":
-                    c2s.append(i)
-
-                if len(c2s) == 2:
-                    break
-
-            if len(c1s) == 2 and len(c2s) == 2:
-                return 2
-
-    for card in cards:
-        if len([c for c in hand if c == card or c == "J"]) == 2:
+        case [x, *_] if x + js == 3:
+            return 3
+        case [x, y, *_] if x + js >= 2 and y + js >= 2 and x + y + js >= 4:
+            return 2
+        case [x, *_] if x + js == 2:
             return 1
-
-    return 0
-
-
-def rank1(hand: str) -> tuple[int, ...]:
-    return (type1(hand),) + tuple(cards.find(c) for c in hand)
+        case _:
+            return 0
 
 
-def rank2(hand: str) -> tuple[int, ...]:
-    return (type2(hand),) + tuple(cards2.find(c) for c in hand)
+def comparator(p2: bool) -> Callable[[tuple[str, int]], tuple[int, ...]]:
+    def compare(hand):
+        return (hand_type(hand, p2), *((cards2 if p2 else cards).find(c) for c in hand))
+
+    return lambda hand_val: compare(hand_val[0])
 
 
-vs = []
+hand_vals = []
 for line in lines:
     hand, score = line.split()
-    vs.append((hand, int(score)))
-
-
-def cmp1(a, b):
-    ar = rank1(a[0])
-    br = rank1(b[0])
-
-    if ar < br:
-        return -1
-    elif ar == br:
-        return 0
-    else:
-        return 1
-
-
-def cmp2(a, b):
-    ar = rank2(a[0])
-    br = rank2(b[0])
-
-    if ar < br:
-        return -1
-    elif ar == br:
-        return 0
-    else:
-        return 1
+    hand_vals.append((hand, int(score)))
 
 
 puzzle.answer_a = sum(
-    (i + 1) * v for i, (_, v) in enumerate(sorted(vs, key=cmp_to_key(cmp1)))
+    (i + 1) * v for i, (_, v) in enumerate(sorted(hand_vals, key=comparator(False)))
 )
 puzzle.answer_b = sum(
-    (i + 1) * v for i, (_, v) in enumerate(sorted(vs, key=cmp_to_key(cmp2)))
+    (i + 1) * v for i, (_, v) in enumerate(sorted(hand_vals, key=comparator(True)))
 )
