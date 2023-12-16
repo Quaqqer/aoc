@@ -426,3 +426,7 @@ def chinese_remainder(congruences: list[tuple[int, int]]) -> tuple[int, int]:
         solution = (solution + a * Mi % M * Ni) % M
 
     return solution, M
+
+
+def flatten(iter: Iterable[Iterable[T]]) -> list[T]:
+    return [v for iter2 in iter for v in iter2]

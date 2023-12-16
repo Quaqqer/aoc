@@ -10,7 +10,13 @@ data = puzzle.input_data
 g = Grid.from_lines(data)
 
 
-def search(bx, by, bdx, bdy):
+def search(bx: int, by: int, bdx: int, bdy: int):
+    """Search in grid of mirrors and splitters for energized tiles
+
+    Because the first tile may be a mirror or splitter, start just outside the grid.
+    For instance: `search(-1, 0, 1, 0)` instead of `search(0, 0, 1, 0)`
+    """
+
     visited = set()
     beams = [((bx, by), (bdx, bdy))]
 
