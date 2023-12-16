@@ -1,5 +1,6 @@
 # 16   00:25:05  1128      0   00:28:20   809      0
-# Eric was sneaky today with the mirror in the start!
+# Eric was sneaky today with the mirror in the start! It helped to know for
+# part 2 at least I guess
 
 from aocd.models import Puzzle
 
@@ -11,27 +12,21 @@ g = Grid.from_lines(data)
 
 
 def search(bx: int, by: int, bdx: int, bdy: int):
-    """Search in grid of mirrors and splitters for energized tiles
-
-    Because the first tile may be a mirror or splitter, start just outside the grid.
-    For instance: `search(-1, 0, 1, 0)` instead of `search(0, 0, 1, 0)`
-    """
+    """Search in grid of mirrors and splitters for energized tiles"""
 
     visited = set()
-    beams = [((bx, by), (bdx, bdy))]
+    beams = [(bx - bdx, by - bdy, bdx, bdy)]
 
     def add(x, y, dx, dy):
-        v = (x, y), (dx, dy)
+        v = x, y, dx, dy
         if v not in visited:
             visited.add(v)
             beams.append(v)
 
     while beams:
-        pos, dir = beams.pop()
-        x, y = pos
-        dx, dy = dir
-
+        x, y, dx, dy = beams.pop()
         nx, ny = x + dx, y + dy
+
         if g.is_outside(nx, ny):
             continue
 
@@ -73,13 +68,13 @@ def search(bx: int, by: int, bdx: int, bdy: int):
             case ".":
                 add(nx, ny, dx, dy)
 
-    return len(set(pos for pos, _ in visited))
+    return len(set((x, y) for x, y, _, _ in visited))
 
 
-puzzle.answer_a = search(-1, 0, 1, 0)
+puzzle.answer_a = search(0, 0, 1, 0)
 puzzle.answer_b = max(
-    *(search(x, -1, 0, 1) for x in range(g.cols)),
-    *(search(x, g.rows, 0, -1) for x in range(g.cols)),
-    *(search(-1, y, 1, 0) for y in range(g.rows)),
-    *(search(g.cols, y, -1, 0) for y in range(g.rows)),
+    *(search(x, 0, 0, 1) for x in range(g.cols)),
+    *(search(x, g.rows - 1, 0, -1) for x in range(g.cols)),
+    *(search(0, y, 1, 0) for y in range(g.rows)),
+    *(search(g.cols - 1, y, -1, 0) for y in range(g.rows)),
 )
