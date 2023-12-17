@@ -27,7 +27,7 @@ def search(bx: int, by: int, bdx: int, bdy: int):
         x, y, dx, dy = beams.pop()
         nx, ny = x + dx, y + dy
 
-        if g.is_outside(nx, ny):
+        if (nx, ny) not in g:
             continue
 
         match g[nx, ny]:

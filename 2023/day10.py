@@ -1,4 +1,4 @@
-#  10   02:07:35  8107      0   03:31:46  4800      0
+# 10   02:07:35  8107      0   03:31:46  4800      0
 # Today was rough, slept < 4 hours. Had i slept 4 hours more maybe I could have
 # spent 2 hours less on the problem. Don't sleep on sleep kids.
 
@@ -37,7 +37,7 @@ def connect(
     x, y = coord
     n = x + dx, y + dy
 
-    if grid.is_outside(*n):
+    if n not in grid:
         return False
 
     ok = False

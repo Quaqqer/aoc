@@ -60,7 +60,7 @@ def search(g: Grid[int], p2: bool) -> int:
             aa = a + 1 if dd == 0 else 1
 
             visit = nx, ny, nd, aa
-            if visit in visited or g.is_outside(nx, ny):
+            if visit in visited or (nx, ny) not in g:
                 continue
 
             visited.add(visit)

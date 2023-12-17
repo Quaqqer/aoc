@@ -1,4 +1,4 @@
-#  11   00:06:32   121      0   00:23:46  1384      0
+# 11   00:06:32   121      0   00:23:46  1384      0
 # finally some good fucking food, first time in top 200, next stop top 100
 
 from aocd.models import Puzzle

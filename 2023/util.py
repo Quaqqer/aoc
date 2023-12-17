@@ -45,22 +45,18 @@ class Grid(Generic[T]):
         return self._cols
 
     @property
-    def max_x(self) -> int:
-        return self._cols
-
-    @property
     def rows(self) -> int:
         return self._rows
-
-    @property
-    def max_y(self) -> int:
-        return self._cols
 
     def is_inside(self, x: int, y: int) -> bool:
         return 0 <= x < self._cols and 0 <= y < self._rows
 
     def is_outside(self, x: int, y: int) -> bool:
         return not self.is_inside(x, y)
+
+    def __contains__(self, coord: Coord) -> bool:
+        x, y = coord
+        return self.is_inside(x, y)
 
     def get(self, x: int, y: int) -> T:
         """Get an item in the grid
