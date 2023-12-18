@@ -1,4 +1,4 @@
-#   2   00:12:00  1879      0   00:19:38  2760      0
+# 2   00:12:00  1879      0   00:19:38  2760      0
 # Reading comprehension...
 
 from collections import defaultdict

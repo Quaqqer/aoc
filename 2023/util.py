@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import math
 import re
 from copy import deepcopy
 from typing import (
@@ -44,22 +45,18 @@ class Grid(Generic[T]):
         return self._cols
 
     @property
-    def max_x(self) -> int:
-        return self._cols
-
-    @property
     def rows(self) -> int:
         return self._rows
-
-    @property
-    def max_y(self) -> int:
-        return self._cols
 
     def is_inside(self, x: int, y: int) -> bool:
         return 0 <= x < self._cols and 0 <= y < self._rows
 
     def is_outside(self, x: int, y: int) -> bool:
         return not self.is_inside(x, y)
+
+    def __contains__(self, coord: Coord) -> bool:
+        x, y = coord
+        return self.is_inside(x, y)
 
     def get(self, x: int, y: int) -> T:
         """Get an item in the grid
@@ -381,3 +378,51 @@ def unindent(s: str) -> str:
 
 def transpose(a: Sequence[Sequence[T]]) -> tuple[tuple[T, ...], ...]:
     return tuple(zip(*a))
+
+
+def modular_inverse(a: int, m: int) -> int | None:
+    """Calculate the modular inverse of a % m, extended euclidean algorithm
+
+    `a` and `m` must be coprime
+
+    Complexity O(min(log(a), log(m))
+    """
+    t, nt = 0, 1
+    r, nr = m, a
+
+    while nr != 0:
+        q = r // nr
+        t, nt = nt, t - q * nt
+        r, nr = nr, r - q * nr
+
+    if r > 1:
+        return None
+
+    return t
+
+
+def chinese_remainder(congruences: list[tuple[int, int]]) -> tuple[int, int]:
+    """Calculate the chinese remainder of a list of congruences.
+
+    Args:
+        congruences:
+            A list of congruences. All moduli must be coprime.
+
+            For example: `[(3, 5), (5, 7)]`
+
+    Returns:
+        The chinese remainder
+    """
+    M = math.prod(m for _, m in congruences)
+    solution = 0
+    for a, m in congruences:
+        Mi = M // m
+        Ni = modular_inverse(Mi, m)
+        assert Ni is not None
+        solution = (solution + a * Mi % M * Ni) % M
+
+    return solution, M
+
+
+def flatten(iter: Iterable[Iterable[T]]) -> list[T]:
+    return [v for iter2 in iter for v in iter2]

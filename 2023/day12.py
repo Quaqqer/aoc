@@ -1,4 +1,4 @@
-#  12   00:30:20  1912      0   00:34:53   469      0
+# 12   00:30:20  1912      0   00:34:53   469      0
 # pretty happy with my time on part 2 :)
 
 import functools
