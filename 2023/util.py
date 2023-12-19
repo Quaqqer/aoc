@@ -372,7 +372,10 @@ class Range:
         return Range(self.start + v, self.end + v)
 
     def __repr__(self) -> str:
-        return f"[{self.start}, {self.end})"
+        return f"{self.start}..{self.end}"
+
+    def len(self) -> int:
+        return self.end - self.start
 
 
 def unindent(s: str) -> str:
