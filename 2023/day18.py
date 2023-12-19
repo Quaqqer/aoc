@@ -153,5 +153,15 @@ def solve(p2: bool) -> int:
     return dug_amt
 
 
-puzzle.answer_a = solve(False)
-puzzle.answer_b = solve(True)
+def solve_shoelace(p2: bool) -> int:
+    path = find_path(data, p2)
+    a = shoelace(path)
+    b = sum(
+        abs(x2 - x1) + abs(y2 - y1)
+        for (x1, y1), (x2, y2) in zip(path, path[1:] + [path[0]])
+    )
+    return a + b // 2 + 1
+
+
+puzzle.answer_a = solve_shoelace(False)
+puzzle.answer_b = solve_shoelace(True)

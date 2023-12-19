@@ -15,6 +15,9 @@ from typing import (
     overload,
 )
 
+import numpy as np
+import numpy.linalg as la
+
 T = TypeVar("T")
 U = TypeVar("U")
 
@@ -426,3 +429,13 @@ def chinese_remainder(congruences: list[tuple[int, int]]) -> tuple[int, int]:
 
 def flatten(iter: Iterable[Iterable[T]]) -> list[T]:
     return [v for iter2 in iter for v in iter2]
+
+
+def shoelace(points: list[Coord]) -> int:
+    return (
+        sum(
+            ax * by - ay * bx
+            for (ax, ay), (bx, by) in zip(points, points[1:] + [points[0]])
+        )
+        // 2
+    )
