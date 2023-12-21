@@ -15,9 +15,6 @@ from typing import (
     overload,
 )
 
-import numpy as np
-import numpy.linalg as la
-
 T = TypeVar("T")
 U = TypeVar("U")
 
@@ -234,7 +231,7 @@ class Grid(Generic[T]):
                     yield x, y
 
     def neighbours4(
-        self, coord: tuple[int, int]
+        self, coord: tuple[int, int], inside: bool = True
     ) -> Generator[tuple[int, int], Any, None]:
         x, y = coord
 
@@ -245,11 +242,11 @@ class Grid(Generic[T]):
             nx = x + dx
             ny = y + dy
 
-            if self.is_inside(nx, ny):
+            if (not inside) or self.is_inside(nx, ny):
                 yield nx, ny
 
     def neighbours8(
-        self, coord: tuple[int, int]
+        self, coord: tuple[int, int], inside: bool = True
     ) -> Generator[tuple[int, int], Any, None]:
         x, y = coord
 
@@ -261,7 +258,7 @@ class Grid(Generic[T]):
                 nx = x + dx
                 ny = y + dy
 
-                if self.is_inside(nx, ny):
+                if (not inside) or self.is_inside(nx, ny):
                     yield nx, ny
 
     def coords(self) -> Generator[tuple[int, int], Any, None]:
@@ -272,6 +269,22 @@ class Grid(Generic[T]):
     def values(self) -> Generator[T, Any, None]:
         for x, y in self.coords():
             yield self[x, y]
+
+    def __iter__(self):
+        return self.coords()
+
+    def __hash__(self):
+        return hash(tuple(tuple(c for c in r) for r in self._grid))
+
+    def __eq__(self, other: Grid[T]):
+        if self.cols != other.cols or self.rows != other.rows:
+            return False
+
+        for pos in self:
+            if self[pos] != other[pos]:
+                return False
+
+        return True
 
 
 def tup_op(
