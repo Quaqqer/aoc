@@ -41,22 +41,24 @@ def visualize(cubes: list[Cube]):
 
 
 def drop(i: int):
+    """Drop cube i. O(n)"""
     old = cubes[i]
     x, y, z = old
-    if z.start == 0:
-        return False
 
-    zs = []
+    # Find the floors below us, the bottom is always 0
+    floors = [0]
     for j in range(len(cubes)):
         if i == j:
             continue
 
         x2, y2, z2 = cubes[j]
+        # If we overlap in x and y we can stand on cube j (if it is below us)
         if x.overlap(x2) is not None and y.overlap(y2) is not None:
+            # Check if it is below us, then add it to the list of floors
             if z2.end <= z.start:
-                zs.append(z2.end)
+                floors.append(z2.end)
 
-    new_z = max([*zs, 0])
+    new_z = max(floors)
 
     delta = new_z - z.start
 
@@ -64,16 +66,8 @@ def drop(i: int):
     cubes[i] = new
 
 
-def collides(a: Cube, b: Cube) -> bool:
-    """If two cubes collide O(1)"""
-    ax, ay, az = a
-    bx, by, bz = b
-    xo, yo, zo = ax.overlap(bx), ay.overlap(by), az.overlap(bz)
-    return all(v is not None for v in (xo, yo, zo))
-
-
 def is_on(a: Cube, b: Cube) -> bool:
-    """Return true if a is on b"""
+    """Return true iff a is on b"""
     ax, ay, az = a
     bx, by, bz = b
     return (
@@ -87,6 +81,7 @@ def ons(i: int) -> list[int]:
     return [j for j in range(len(cubes)) if i != j and is_on(cubes[j], cubes[i])]
 
 
+@functools.cache
 def belows(i: int) -> list[int]:
     """Cubes that are below i"""
     return [j for j in range(len(cubes)) if i != j and is_on(cubes[i], cubes[j])]
