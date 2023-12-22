@@ -384,6 +384,9 @@ class Range:
     def __add__(self, v: int) -> Range:
         return Range(self.start + v, self.end + v)
 
+    def __sub__(self, v: int) -> Range:
+        return self + (-v)
+
     def __repr__(self) -> str:
         return f"{self.start}..{self.end}"
 
