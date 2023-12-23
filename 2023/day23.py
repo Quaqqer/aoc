@@ -1,9 +1,6 @@
 # 23   00:10:20   150      0   00:47:28   182      0
 # Fast solution => good day, hooray! 🎉
 
-from heapq import heappop as pop
-from heapq import heappush as push
-
 from aocd.models import Puzzle
 
 from util import *
@@ -62,20 +59,27 @@ def find_all_intersections(g: Grid[str], p2: bool) -> dict[Coord, dict[Coord, in
 def max_path(g: Grid[str], p2: bool) -> int:
     inns = find_all_intersections(g, p2)
 
-    anss = []
+    best = 0
 
-    q: list[tuple[int, Coord, set[Coord]]] = [(0, s, {s})]
-    while q:
-        dist, coord, visited = pop(q)
+    v: set[Coord] = set()
 
-        if coord == e:
-            anss.append(-dist)
+    def dfs(c: Coord, dist: int):
+        nonlocal best
+
+        v.add(c)
+
+        if c == e:
+            best = max(best, dist)
         else:
-            for neigh, d in inns[coord].items():
-                if neigh not in visited:
-                    push(q, (dist - d, neigh, visited | {neigh}))
+            for n, d in inns[c].items():
+                if n not in v:
+                    dfs(n, dist + d)
 
-    return max(anss)
+        v.remove(c)
+
+    dfs(s, 0)
+
+    return best
 
 
 puzzle.answer_a = max_path(g, False)
