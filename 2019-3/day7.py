@@ -1,3 +1,4 @@
+import itertools
 from collections import deque
 from copy import copy
 from enum import Enum
@@ -7,7 +8,7 @@ from aocd.models import Puzzle
 
 import util
 
-puzzle = Puzzle(2019, int("05"))
+puzzle = Puzzle(2019, int("07"))
 data = puzzle.input_data
 program = util.ints(data.split(","))
 
@@ -124,11 +125,45 @@ class IntPC:
             self.state = State.NONE
 
 
-intpc1 = IntPC(program, [1])
-intpc1.run()
-assert intpc1.state == State.HALTED
-puzzle.answer_a = intpc1.outputs[-1]
+def run_a(phases: tuple[int, int, int, int, int]) -> int:
+    assert len(phases) == 5
+    v = 0
+    for phase in phases:
+        intpc = IntPC(program, [phase, v])
+        intpc.run()
+        [v] = intpc.outputs
+    return v
 
-intpc2 = IntPC(program, [5])
-intpc2.run()
-puzzle.answer_b = intpc2.outputs[-1]
+
+puzzle.answer_a = max(
+    run_a(phases) for phases in itertools.permutations([0, 1, 2, 3, 4, 5], 5)
+)
+
+
+def run_b(phases: tuple[int, int, int, int, int]) -> int:
+    pcs = [IntPC(program) for _ in range(5)]
+
+    for i, phase in enumerate(phases):
+        pcs[i].queue_inputs(phase)
+
+    v = 0
+    e = 0
+
+    while True:
+        for i, intpc in enumerate(pcs):
+            if intpc.state == State.HALTED:
+                return e
+
+            intpc.queue_inputs(v)
+            intpc.run()
+            v = intpc.outputs[-1]
+
+            if intpc == pcs[-1]:
+                e = v
+
+            i = (i + 1) % 5
+
+
+puzzle.answer_b = max(
+    run_b(phases) for phases in itertools.permutations([5, 6, 7, 8, 9], 5)
+)
