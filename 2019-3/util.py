@@ -7,21 +7,15 @@ from typing import (
     Any,
     Callable,
     Generator,
-    Generic,
     Iterable,
     Sequence,
-    TypeAlias,
-    TypeVar,
     overload,
 )
 
-T = TypeVar("T")
-U = TypeVar("U")
-
-Coord: TypeAlias = "tuple[int, int]"
+type Coord = tuple[int, int]
 
 
-class Grid(Generic[T]):
+class Grid[T]:
     def __init__(self, cols: int, rows: int, _grid: list[list[T]]):
         self._cols = cols
         self._rows = rows
@@ -139,14 +133,14 @@ class Grid(Generic[T]):
                 for yy in range(y.start, y.stop, y.step):
                     self.set(xx, yy, v)
 
-    def map(self, fn: Callable[[T], U]) -> Grid[U]:
+    def map[U](self, fn: Callable[[T], U]) -> Grid[U]:
         return Grid(
             self.cols,
             self.rows,
             [[fn(self[x, y]) for x in range(self.cols)] for y in range(self.rows)],
         )
 
-    def map_with_pos(self, fn: Callable[[tuple[int, int], T], U]) -> Grid[U]:
+    def map_with_pos[U](self, fn: Callable[[tuple[int, int], T], U]) -> Grid[U]:
         return Grid(
             self.cols,
             self.rows,
@@ -273,7 +267,10 @@ class Grid(Generic[T]):
     def __hash__(self):
         return hash(tuple(tuple(c for c in r) for r in self._grid))
 
-    def __eq__(self, other: Grid[T]):
+    def __eq__(self, other: object):
+        if not isinstance(other, Grid):
+            return False
+
         if self.cols != other.cols or self.rows != other.rows:
             return False
 
@@ -284,25 +281,25 @@ class Grid(Generic[T]):
         return True
 
 
-def tup_op(
+def tup_op[T](
     a: tuple[T, ...], b: tuple[T, ...], op: Callable[[T, T], T]
 ) -> tuple[T, ...]:
     return tuple(op(aa, bb) for aa, bb in zip(a, b))
 
 
-def tup_add(a: tuple[T, ...], b: tuple[T, ...]) -> tuple[T, ...]:
-    return tup_op(a, b, lambda aa, bb: aa + bb)  # type: ignore
+def tup_add[*Ts](a: tuple[*Ts], b: tuple[*Ts]) -> tuple[*Ts]:
+    return tup_op(a, b, lambda aa, bb: aa + bb)
 
 
-def tup_sub(a: tuple[T, ...], b: tuple[T, ...]) -> tuple[T, ...]:
+def tup_sub[T](a: tuple[T, ...], b: tuple[T, ...]) -> tuple[T, ...]:
     return tup_op(a, b, lambda aa, bb: aa - bb)  # type: ignore
 
 
-def tup_mul(a: tuple[T, ...], b: tuple[T, ...]) -> tuple[T, ...]:
+def tup_mul[T](a: tuple[T, ...], b: tuple[T, ...]) -> tuple[T, ...]:
     return tup_op(a, b, lambda aa, bb: aa * bb)  # type: ignore
 
 
-def tup_div(a: tuple[T, ...], b: tuple[T, ...]) -> tuple[T, ...]:
+def tup_div[T](a: tuple[T, ...], b: tuple[T, ...]) -> tuple[T, ...]:
     return tup_op(a, b, lambda aa, bb: aa / bb)  # type: ignore
 
 
@@ -395,7 +392,7 @@ def unindent(s: str) -> str:
     return "\n".join(l.lstrip() for l in s.splitlines())
 
 
-def transpose(a: Sequence[Sequence[T]]) -> tuple[tuple[T, ...], ...]:
+def transpose[T](a: Sequence[Sequence[T]]) -> tuple[tuple[T, ...], ...]:
     return tuple(zip(*a))
 
 
@@ -443,7 +440,7 @@ def chinese_remainder(congruences: list[tuple[int, int]]) -> tuple[int, int]:
     return solution, M
 
 
-def flatten(iter: Iterable[Iterable[T]]) -> list[T]:
+def flatten[T](iter: Iterable[Iterable[T]]) -> list[T]:
     return [v for iter2 in iter for v in iter2]
 
 
@@ -455,3 +452,95 @@ def shoelace(points: list[Coord]) -> int:
         )
         // 2
     )
+
+
+class Vec3[T: (int, float)]:
+    def __init__(self, x: T, y: T, z: T):
+        self.__x = x
+        self.__y = y
+        self.__z = z
+
+    @property
+    def x(self) -> T:
+        return self.__x
+
+    @property
+    def y(self) -> T:
+        return self.__y
+
+    @property
+    def z(self) -> T:
+        return self.__z
+
+    def __add__(self, other: Vec3[T]) -> Vec3[T]:
+        return Vec3(self.__x + other.__x, self.__y + other.__y, self.__z + other.__z)
+
+    def __sub__(self, other: Vec3[T]) -> Vec3[T]:
+        return Vec3(self.__x - other.__x, self.__y - other.__y, self.__z - other.__z)
+
+    def __mul__(self, other: Vec3[T]) -> Vec3[T]:
+        return Vec3(self.__x * other.__x, self.__y * other.__y, self.__z * other.__z)
+
+    def __div__(self, other: Vec3[T]) -> Vec3[float]:
+        return Vec3(self.__x / other.__x, self.__y / other.__y, self.__z / other.__z)
+
+    def __floordiv__(self, other: Vec3[T]) -> Vec3[T]:
+        return Vec3(self.__x // other.__x, self.__y // other.__y, self.__z // other.__z)
+
+    def __lt__(self, other: Vec3[T]) -> bool:
+        return self.to_tuple() < other.to_tuple()
+
+    def __le__(self, other: Vec3[T]) -> bool:
+        return self.to_tuple() <= other.to_tuple()
+
+    def __eq__(self, other: object) -> bool:
+        if not isinstance(other, Vec3):
+            return False
+
+        return self.to_tuple() == other.to_tuple()
+
+    def __ne__(self, other: object) -> bool:
+        return not (self == other)
+
+    def __ge__(self, other: Vec3[T]) -> bool:
+        return self.to_tuple() >= other.to_tuple()
+
+    def __gt__(self, other: Vec3[T]) -> bool:
+        return self.to_tuple() > other.to_tuple()
+
+    def __abs__(self) -> Vec3[float]:
+        return Vec3(abs(self.__x), abs(self.__y), abs(self.__z))
+
+    def __hash__(self) -> int:
+        return hash(self.to_tuple())
+
+    def __repr__(self) -> str:
+        return f"Vec3({self.__x}, {self.__y}, {self.__z})"
+
+    def to_tuple(self) -> tuple[T, T, T]:
+        return (self.__x, self.__y, self.__z)
+
+    @staticmethod
+    def from_tuple(tup: tuple[T, T, T]) -> Vec3[T]:
+        return Vec3(*tup)
+
+    def length(self) -> float:
+        return math.hypot(self.__x, self.__y, self.__z)
+
+    def distance(self, other: Vec3[T]) -> float:
+        return (other - self).length()
+
+    def manhattan(self) -> T:
+        return self.__x + self.__y + self.__z
+
+
+def sign[T: (int, float)](a: T) -> int:
+    if a < 0:
+        return -1
+    if a > 0:
+        return 1
+    return 0
+
+
+def spaceship[T: (int, float)](a: T, b: T) -> int:
+    return sign(a - b)
