@@ -8,6 +8,7 @@ from typing import (
     Callable,
     Generator,
     Iterable,
+    Never,
     Sequence,
     overload,
 )
@@ -459,6 +460,9 @@ class Vec2[T: (int, float)]:
         self.__x = x
         self.__y = y
 
+    def __setattr__(self, attr: str, value: Never):
+        raise AttributeError(f"Vec2 is frozen, cannot set {attr} attribute")
+
     @property
     def x(self) -> T:
         return self.__x
@@ -540,6 +544,9 @@ class Vec3[T: (int, float)]:
         self.__x = x
         self.__y = y
         self.__z = z
+
+    def __setattr__(self, attr: str, value: Never):
+        raise AttributeError(f"Vec3 is frozen, cannot set {attr} attribute")
 
     @property
     def x(self) -> T:
