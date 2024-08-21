@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import math
 import re
+from collections import deque
 from copy import deepcopy
 from typing import (
     Any,
@@ -280,38 +281,6 @@ class Grid[T]:
                 return False
 
         return True
-
-
-def tup_op[T](
-    a: tuple[T, ...], b: tuple[T, ...], op: Callable[[T, T], T]
-) -> tuple[T, ...]:
-    return tuple(op(aa, bb) for aa, bb in zip(a, b))
-
-
-def tup_add[*Ts](a: tuple[*Ts], b: tuple[*Ts]) -> tuple[*Ts]:
-    return tup_op(a, b, lambda aa, bb: aa + bb)
-
-
-def tup_sub[T](a: tuple[T, ...], b: tuple[T, ...]) -> tuple[T, ...]:
-    return tup_op(a, b, lambda aa, bb: aa - bb)  # type: ignore
-
-
-def tup_mul[T](a: tuple[T, ...], b: tuple[T, ...]) -> tuple[T, ...]:
-    return tup_op(a, b, lambda aa, bb: aa * bb)  # type: ignore
-
-
-def tup_div[T](a: tuple[T, ...], b: tuple[T, ...]) -> tuple[T, ...]:
-    return tup_op(a, b, lambda aa, bb: aa / bb)  # type: ignore
-
-
-def tup_idiv(a: tuple[int, ...], b: tuple[int, ...]) -> tuple[int, ...]:
-    return tup_op(a, b, lambda aa, bb: aa // bb)
-
-
-def manhattan(a: tuple[int, int], b: tuple[int, int] | None = None) -> int:
-    ax, ay = a
-    bx, by = b if b is not None else (0, 0)
-    return abs(ax - bx) + abs(ay - by)
 
 
 def print_set_grid(
@@ -639,3 +608,44 @@ def sign[T: (int, float)](a: T) -> int:
 
 def spaceship[T: (int, float)](a: T, b: T) -> int:
     return sign(a - b)
+
+
+def chunk[T](
+    iterable: Iterable[T], size: int, throw_on_cut=True
+) -> Iterable[tuple[T, ...]]:
+    l: list[T] = []
+
+    it = iter(iterable)
+
+    while True:
+        try:
+            v = next(it)
+
+            l.append(v)
+
+            if len(l) == size:
+                yield tuple(l)
+                l.clear()
+        except StopIteration:
+            if throw_on_cut and l != []:
+                raise Exception("Could not split iterable into equal sized chunks")
+            break
+
+
+def sliding_window[T](iterable: Iterable[T], size: int) -> Iterable[tuple[T, ...]]:
+    window = deque()
+
+    it = iter(iterable)
+
+    while True:
+        try:
+            v = next(it)
+            window.append(v)
+
+            if len(window) > size:
+                window.popleft()
+
+            if len(window) == size:
+                yield tuple(window)
+        except StopIteration:
+            break
