@@ -21,6 +21,7 @@ class Grid[T]:
     def __init__(self, cols: int, rows: int, _grid: list[list[T]]):
         self._cols = cols
         self._rows = rows
+        # Index by _grid[y][x]
         self._grid = _grid
 
     def copy(self) -> Grid[T]:
@@ -158,6 +159,10 @@ class Grid[T]:
             self.cols,
             [[self[y, x] for y in range(self.rows)] for x in range(self.cols)],
         )
+
+    @staticmethod
+    def new_fill(fill: Callable[[], T], cols: int, rows: int) -> Grid[T]:
+        return Grid.from_2d_list([[fill() for _ in range(cols)] for _ in range(rows)])
 
     @staticmethod
     def from_lines(s: str) -> Grid[str]:
