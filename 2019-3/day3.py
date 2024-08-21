@@ -25,5 +25,5 @@ def draw_line(instructions: str) -> dict[tuple[int, int], int]:
 a = draw_line(lines[0])
 b = draw_line(lines[1])
 
-puzzle.answer_a = min(util.manhattan(p) for p in a if p in b)
+puzzle.answer_a = min(util.Vec2(*p).manhattan() for p in a if p in b)
 puzzle.answer_b = min(a[p] + b[p] for p in a if p in b)

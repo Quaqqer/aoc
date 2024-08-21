@@ -9,8 +9,8 @@ from typing import (
     Callable,
     Generator,
     Iterable,
-    Never,
     Sequence,
+    cast,
     overload,
 )
 
@@ -283,6 +283,10 @@ class Grid[T]:
         return True
 
 
+def clear_term():
+    print("\033[2J")
+
+
 def print_set_grid(
     grid: set[tuple[int, int]] | dict[tuple[int, int], str | int],
     empty: str = ".",
@@ -303,11 +307,13 @@ def print_set_grid(
         else (lambda k: str(grid.get(k, empty)))  # type: ignore
     )
 
+    lines = []
     for y in range(miny, maxy + 1):
         line = ""
         for x in range(minx, maxx + 1):
             line += get((x, y))
-        print(line)
+        lines.append(line)
+    print("\n".join(lines))
 
 
 def print_grid(grid: Sequence[Sequence[str | int]], transpose=False):
@@ -429,9 +435,6 @@ class Vec2[T: (int, float)]:
         self.__x = x
         self.__y = y
 
-    def __setattr__(self, attr: str, value: Never):
-        raise AttributeError(f"Vec2 is frozen, cannot set {attr} attribute")
-
     @property
     def x(self) -> T:
         return self.__x
@@ -476,8 +479,8 @@ class Vec2[T: (int, float)]:
     def __gt__(self, other: Vec2[T]) -> bool:
         return self.to_tuple() > other.to_tuple()
 
-    def __abs__(self) -> Vec2[float]:
-        return Vec2(abs(self.__x), abs(self.__y))
+    def __abs__(self) -> Vec2[T]:
+        return Vec2(cast(T, abs(self.__x)), cast(T, abs(self.__y)))
 
     def __hash__(self) -> int:
         return hash(self.to_tuple())
@@ -499,7 +502,7 @@ class Vec2[T: (int, float)]:
         return (other - self).length()
 
     def manhattan(self) -> T:
-        return self.__x + self.__y
+        return cast(T, abs(self.__x) + abs(self.__y))
 
     def updated(self, x: int | None = None, y: int | None = None):
         return Vec2(
@@ -513,9 +516,6 @@ class Vec3[T: (int, float)]:
         self.__x = x
         self.__y = y
         self.__z = z
-
-    def __setattr__(self, attr: str, value: Never):
-        raise AttributeError(f"Vec3 is frozen, cannot set {attr} attribute")
 
     @property
     def x(self) -> T:
@@ -588,7 +588,7 @@ class Vec3[T: (int, float)]:
         return (other - self).length()
 
     def manhattan(self) -> T:
-        return self.__x + self.__y + self.__z
+        return cast(T, abs(self.__x) + abs(self.__y) + abs(self.__z))
 
     def updated(self, x: int | None = None, y: int | None = None, z: int | None = None):
         return Vec3(

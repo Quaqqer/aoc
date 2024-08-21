@@ -1,7 +1,6 @@
 from collections import Counter, deque
 from copy import copy
 from enum import Enum
-from time import sleep
 from typing import Deque, Iterable
 
 from aocd.models import Puzzle
@@ -145,48 +144,5 @@ class IntPC:
         self.outputs = []
 
 
-screen: dict[tuple[int, int], str | int] = {}
-score = 0
-
-
-def render():
-    for x, y, id in util.chunk(intpc.consume_outputs(), 3):
-        if x == -1 and y == 0:
-            global score
-            score = id
-            continue
-
-        char = {0: " ", 1: "░", 2: "█", 3: "▔", 4: "●"}[id]
-        screen[x, y] = char
-
-
+x, y = 0, 0
 intpc = IntPC(program)
-intpc.run()
-
-render()
-
-puzzle.answer_a = Counter(screen.values())["█"]
-
-
-intpc = IntPC(program)
-intpc.mem[0] = 2
-
-screen = {}
-score = 0
-
-while intpc.state != State.HALTED:
-    intpc.run()
-    render()
-
-    ks = list(screen.keys())
-    vs = list(screen.values())
-
-    ball_x = ks[vs.index("●")][0]
-    paddle_x = ks[vs.index("▔")][0]
-
-    intpc.queue_inputs(util.spaceship(ball_x, paddle_x))
-
-    util.clear_term()
-    util.print_set_grid(screen)
-
-puzzle.answer_b = score

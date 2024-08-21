@@ -75,4 +75,4 @@ while any(cycle is None for cycle in cycles.values()):
     step(moons_b)
     s += 1
 
-puzzle.answer_b = math.lcm(*(cast(int, cycle) for cycle in cycles))
+puzzle.answer_b = math.lcm(*(cast(int, cycle) for cycle in cycles.values()))
