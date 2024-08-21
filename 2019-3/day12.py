@@ -1,5 +1,7 @@
+import math
 from copy import deepcopy
 from dataclasses import dataclass
+from typing import Literal, cast
 
 from aocd.models import Puzzle
 
@@ -43,3 +45,34 @@ for _ in range(1000):
 puzzle.answer_a = sum(
     sum(abs(moon.pos).to_tuple()) * sum(abs(moon.vel).to_tuple()) for moon in moons_a
 )
+
+# For b, simulate it all but keep track of seen states in each respective
+# dimension, since dimensions are independent.
+moons_b = deepcopy(moons)
+
+type Dim = Literal["x"] | Literal["y"] | Literal["z"]
+
+dims: tuple[Dim, ...] = "x", "y", "z"
+seen: dict[Dim, set[tuple[tuple[int, int], ...]]] = {dim: set() for dim in dims}
+cycles: dict[Dim, int | None] = {dim: None for dim in dims}
+
+s = 0
+
+while any(cycle is None for cycle in cycles.values()):
+    for dim in dims:
+        if cycles[dim] is not None:
+            continue
+
+        state = tuple(
+            (getattr(moon.pos, dim), getattr(moon.vel, dim)) for moon in moons_b
+        )
+
+        if state in seen[dim]:
+            cycles[dim] = s
+        else:
+            seen[dim].add(state)
+
+    step(moons_b)
+    s += 1
+
+puzzle.answer_b = math.lcm(*(cast(int, cycle) for cycle in cycles))

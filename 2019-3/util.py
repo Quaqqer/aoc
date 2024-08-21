@@ -454,6 +454,87 @@ def shoelace(points: list[Coord]) -> int:
     )
 
 
+class Vec2[T: (int, float)]:
+    def __init__(self, x: T, y: T):
+        self.__x = x
+        self.__y = y
+
+    @property
+    def x(self) -> T:
+        return self.__x
+
+    @property
+    def y(self) -> T:
+        return self.__y
+
+    def __add__(self, other: Vec2[T]) -> Vec2[T]:
+        return Vec2(self.__x + other.__x, self.__y + other.__y)
+
+    def __sub__(self, other: Vec2[T]) -> Vec2[T]:
+        return Vec2(self.__x - other.__x, self.__y - other.__y)
+
+    def __mul__(self, other: Vec2[T]) -> Vec2[T]:
+        return Vec2(self.__x * other.__x, self.__y * other.__y)
+
+    def __div__(self, other: Vec2[T]) -> Vec2[float]:
+        return Vec2(self.__x / other.__x, self.__y / other.__y)
+
+    def __floordiv__(self, other: Vec2[T]) -> Vec2[T]:
+        return Vec2(self.__x // other.__x, self.__y // other.__y)
+
+    def __lt__(self, other: Vec2[T]) -> bool:
+        return self.to_tuple() < other.to_tuple()
+
+    def __le__(self, other: Vec2[T]) -> bool:
+        return self.to_tuple() <= other.to_tuple()
+
+    def __eq__(self, other: object) -> bool:
+        if not isinstance(other, Vec2):
+            return False
+
+        return self.to_tuple() == other.to_tuple()
+
+    def __ne__(self, other: object) -> bool:
+        return not (self == other)
+
+    def __ge__(self, other: Vec2[T]) -> bool:
+        return self.to_tuple() >= other.to_tuple()
+
+    def __gt__(self, other: Vec2[T]) -> bool:
+        return self.to_tuple() > other.to_tuple()
+
+    def __abs__(self) -> Vec2[float]:
+        return Vec2(abs(self.__x), abs(self.__y))
+
+    def __hash__(self) -> int:
+        return hash(self.to_tuple())
+
+    def __repr__(self) -> str:
+        return f"Vec2({self.__x}, {self.__y})"
+
+    def to_tuple(self) -> tuple[T, T]:
+        return (self.__x, self.__y)
+
+    @staticmethod
+    def from_tuple(tup: tuple[T, T]) -> Vec2[T]:
+        return Vec2(*tup)
+
+    def length(self) -> float:
+        return math.hypot(self.__x, self.__y)
+
+    def distance(self, other: Vec2[T]) -> float:
+        return (other - self).length()
+
+    def manhattan(self) -> T:
+        return self.__x + self.__y
+
+    def updated(self, x: int | None = None, y: int | None = None):
+        return Vec2(
+            self.x if x is None else x,
+            self.y if y is None else y,
+        )
+
+
 class Vec3[T: (int, float)]:
     def __init__(self, x: T, y: T, z: T):
         self.__x = x
@@ -532,6 +613,13 @@ class Vec3[T: (int, float)]:
 
     def manhattan(self) -> T:
         return self.__x + self.__y + self.__z
+
+    def updated(self, x: int | None = None, y: int | None = None, z: int | None = None):
+        return Vec3(
+            self.x if x is None else x,
+            self.y if y is None else y,
+            self.z if z is None else z,
+        )
 
 
 def sign[T: (int, float)](a: T) -> int:
