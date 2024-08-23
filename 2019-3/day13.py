@@ -1,12 +1,10 @@
 from collections import Counter, deque
 from copy import copy
 from enum import Enum
-from time import sleep
 from typing import Deque, Iterable
 
-from aocd.models import Puzzle
-
 import util
+from aocd.models import Puzzle
 
 puzzle = Puzzle(2019, int("13"))
 data = puzzle.input_data
