@@ -7,8 +7,8 @@ from copy import deepcopy
 from typing import (
     Any,
     Callable,
-    Generator,
     Iterable,
+    Iterator,
     Sequence,
     cast,
     overload,
@@ -55,7 +55,7 @@ class Grid[T]:
         x, y = coord
         return self.is_inside(x, y)
 
-    def get(self, x: int, y: int) -> T:
+    def get[E](self, x: int, y: int, default: E = None) -> T | E:
         """Get an item in the grid
 
         Args:
@@ -65,6 +65,9 @@ class Grid[T]:
         Returns:
             The item
         """
+        if (x, y) not in self:
+            return default
+
         return self._grid[y][x]
 
     def set(self, x: int, y: int, v: T):
@@ -221,16 +224,19 @@ class Grid[T]:
 
     def find(
         self, f: Callable[[tuple[int, int], T], bool]
-    ) -> Generator[tuple[int, int], Any, None]:
+    ) -> Iterator[tuple[int, int]]:
         for x in range(self.cols):
             for y in range(self.rows):
                 v = self[x, y]
                 if f((x, y), v):
                     yield x, y
 
+    def find_value(self, v: T) -> Iterator[tuple[int, int]]:
+        return self.find(lambda _, vv: v == vv)
+
     def neighbours4(
         self, coord: tuple[int, int], inside: bool = True
-    ) -> Generator[tuple[int, int], Any, None]:
+    ) -> Iterator[tuple[int, int]]:
         x, y = coord
 
         for dx, dy in [(0, 1), (0, -1), (1, 0), (-1, 0)]:
@@ -245,7 +251,7 @@ class Grid[T]:
 
     def neighbours8(
         self, coord: tuple[int, int], inside: bool = True
-    ) -> Generator[tuple[int, int], Any, None]:
+    ) -> Iterator[tuple[int, int]]:
         x, y = coord
 
         for dx in [-1, 0, 1]:
@@ -259,12 +265,12 @@ class Grid[T]:
                 if (not inside) or self.is_inside(nx, ny):
                     yield nx, ny
 
-    def coords(self) -> Generator[tuple[int, int], Any, None]:
+    def coords(self) -> Iterator[tuple[int, int]]:
         for x in range(self.cols):
             for y in range(self.rows):
                 yield x, y
 
-    def values(self) -> Generator[T, Any, None]:
+    def values(self) -> Iterator[T]:
         for x, y in self.coords():
             yield self[x, y]
 
@@ -514,6 +520,18 @@ class Vec2[T: (int, float)]:
             self.x if x is None else x,
             self.y if y is None else y,
         )
+
+    def rot_r(self, y_down=True) -> Vec2[T]:
+        if not y_down:
+            return Vec2(self.y, -self.x)
+
+        return Vec2(-self.y, self.x)
+
+    def rot_l(self, y_down=True) -> Vec2[T]:
+        if not y_down:
+            return Vec2(-self.y, self.x)
+
+        return Vec2(self.y, -self.x)
 
 
 class Vec3[T: (int, float)]:
