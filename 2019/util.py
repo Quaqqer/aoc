@@ -11,6 +11,7 @@ from typing import (
     Iterable,
     Iterator,
     Sequence,
+    assert_never,
     cast,
     overload,
 )
@@ -82,7 +83,7 @@ class Grid[T]:
         self._grid[y][x] = v
 
     @overload
-    def __getitem__(self, index: tuple[int, int]) -> T: ...
+    def __getitem__(self, index: tuple[int, int] | Vec2[int]) -> T: ...
 
     @overload
     def __getitem__(self, index: tuple[slice, int] | tuple[int, slice]) -> list[T]: ...
@@ -91,54 +92,58 @@ class Grid[T]:
     def __getitem__(self, index: tuple[slice, slice]) -> Grid[T]: ...
 
     def __getitem__(
-        self, index: tuple[int | slice, int | slice]
+        self, index: tuple[int | slice, int | slice] | Vec2[int]
     ) -> T | list[T] | Grid[T]:
         """Get values in the grid
 
         Args:
             coord: (x, y) coordinate
         """
-        x, y = index
-        if isinstance(x, int) and isinstance(y, int):
-            return self.get(x, y)
-        elif isinstance(x, slice) and isinstance(y, int):
-            return [self.get(xx, y) for xx in range(x.start, x.stop, x.step)]
-        elif isinstance(x, int) and isinstance(y, slice):
-            return [self.get(x, yy) for yy in range(y.start, y.stop, y.step)]
-        else:
-            assert isinstance(x, slice) and isinstance(y, slice)
-            cols = x.stop - x.start
-            rows = y.stop - y.start
-            return Grid(
-                cols,
-                rows,
-                [
-                    [self.get(xx, yy) for xx in range(x.start, x.stop, x.step)]
-                    for yy in range(y.start, y.stop, y.step)
-                ],
-            )
+        match index:
+            case int(x), int(y):
+                return self._grid[y][x]
+            case Vec2(x, y):
+                return self._grid[y][x]
+            case x, int(y) if isinstance(x, slice):
+                return [self._grid[y][xx] for xx in range(x.start, x.stop, x.step)]
+            case int(x), y if isinstance(y, slice):
+                return [self._grid[yy][x] for yy in range(y.start, y.stop, y.step)]
+            case x, y if isinstance(x, slice) and isinstance(y, slice):
+                return Grid.from_2d_list(
+                    [
+                        [self._grid[yy][xx] for xx in range(x.start, x.stop, x.step)]
+                        for yy in range(y.start, y.stop, y.step)
+                    ],
+                )
+            case _:
+                raise Exception("Invalid arguments")
 
-    def __setitem__(self, index: tuple[int | slice, int | slice], v: T) -> None:
+    def __setitem__(
+        self, index: tuple[int | slice, int | slice] | Vec2[int], v: T
+    ) -> None:
         """Set an item in the grid
 
         Args:
             coord: (x, y) coordinate
             v: Value
         """
-        x, y = index
-        if isinstance(x, int) and isinstance(y, int):
-            self.set(x, y, v)
-        elif isinstance(x, slice) and isinstance(y, int):
-            for xx in range(x.start, x.stop, x.step):
-                self.set(xx, y, v)
-        elif isinstance(x, int) and isinstance(y, slice):
-            for yy in range(y.start, y.stop, y.step):
-                self.set(x, yy, v)
-        else:
-            assert isinstance(x, slice) and isinstance(y, slice)
-            for xx in range(x.start, x.stop, x.step):
+        match index:
+            case int(x), int(y):
+                self.set(x, y, v)
+            case Vec2(x, y):
+                self.set(x, y, v)
+            case x, int(y) if isinstance(x, slice):
+                for xx in range(x.start, x.stop, x.step):
+                    self.set(xx, y, v)
+            case int(x), y if isinstance(y, slice):
                 for yy in range(y.start, y.stop, y.step):
-                    self.set(xx, yy, v)
+                    self.set(x, yy, v)
+            case x, y if isinstance(x, slice) and isinstance(y, slice):
+                for xx in range(x.start, x.stop, x.step):
+                    for yy in range(y.start, y.stop, y.step):
+                        self.set(xx, yy, v)
+            case _:
+                raise Exception("Invalid arguments")
 
     def map[U](self, fn: Callable[[T], U]) -> Grid[U]:
         return Grid(
@@ -443,9 +448,24 @@ def shoelace(points: list[Coord]) -> int:
 
 
 class Vec2[T: (int, float)]:
-    def __init__(self, x: T, y: T):
-        self.__x = x
-        self.__y = y
+    @overload
+    def __init__(self, x: T, y: T): ...
+
+    @overload
+    def __init__(self, x: tuple[T, T]): ...
+
+    def __init__(self, x: T | tuple[T, T], y: T | None = None):
+        match (x, y):
+            case ((xx, yy), None):
+                self.__x: T = xx
+                self.__y: T = yy
+            case (x, y):
+                self.__x: T = cast(T, x)
+                self.__y: T = cast(T, y)
+            case _:
+                raise Exception("Unexpected constructor")
+
+    __match_args__ = ("x", "y")
 
     @property
     def x(self) -> T:
@@ -503,6 +523,10 @@ class Vec2[T: (int, float)]:
     def to_tuple(self) -> tuple[T, T]:
         return (self.__x, self.__y)
 
+    @property
+    def tup(self) -> tuple[T, T]:
+        return (self.__x, self.__y)
+
     @staticmethod
     def from_tuple(tup: tuple[T, T]) -> Vec2[T]:
         return Vec2(*tup)
@@ -533,6 +557,23 @@ class Vec2[T: (int, float)]:
             return Vec2(-self.y, self.x)
 
         return Vec2(self.y, -self.x)
+
+    @staticmethod
+    def delta_4() -> tuple[Vec2, ...]:
+        return (Vec2(1, 0), Vec2(0, 1), Vec2(-1, 0), Vec2(0, -1))
+
+    @staticmethod
+    def delta_8() -> tuple[Vec2, ...]:
+        return (
+            Vec2(1, 0),
+            Vec2(1, 1),
+            Vec2(0, 1),
+            Vec2(-1, 1),
+            Vec2(-1, 0),
+            Vec2(-1, -1),
+            Vec2(0, -1),
+            Vec2(1, -1),
+        )
 
 
 class Vec3[T: (int, float)]:
