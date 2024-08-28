@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import heapq
 import math
 import re
 from collections import deque
@@ -672,3 +673,24 @@ def sliding_window[T](iterable: Iterable[T], size: int) -> Iterable[tuple[T, ...
                 yield tuple(window)
         except StopIteration:
             break
+
+
+class Heap[T]:
+    def __init__(self, iterable: Iterable[T] = []):
+        self.__queue = list(iterable)
+        heapq.heapify(self.__queue)
+
+    def push(self, v: T):
+        heapq.heappush(self.__queue, v)
+
+    def pop(self) -> T:
+        return heapq.heappop(self.__queue)
+
+    def __bool__(self) -> bool:
+        return len(self.__queue) != 0
+
+    def __repr__(self) -> str:
+        if self.__queue:
+            return f"Heap([{self.__queue[0]}])"
+        else:
+            return "Heap([])"
