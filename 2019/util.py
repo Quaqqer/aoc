@@ -53,9 +53,14 @@ class Grid[T]:
     def is_outside(self, x: int, y: int) -> bool:
         return not self.is_inside(x, y)
 
-    def __contains__(self, coord: Coord) -> bool:
-        x, y = coord
-        return self.is_inside(x, y)
+    def __contains__(self, coord: Coord | Vec2[int]) -> bool:
+        match coord:
+            case int(x), int(y):
+                return self.is_inside(x, y)
+            case Vec2(x, y):
+                return self.is_inside(x, y)
+            case _:
+                raise Exception("Unexpected argument")
 
     def get[E](self, x: int, y: int, default: E = None) -> T | E:
         """Get an item in the grid
