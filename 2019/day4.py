@@ -1,7 +1,6 @@
 from collections import Counter
 
 from aocd.models import Puzzle
-
 from util import ints
 
 puzzle = Puzzle(2019, int("04"))
@@ -26,5 +25,5 @@ def check_b(v: int) -> bool:
     )
 
 
-puzzle.answer_a = sum([1 for i in range(a, b + 1) if check_a(i)])
-puzzle.answer_b = sum([1 for i in range(a, b + 1) if check_b(i)])
+puzzle.answer_a = sum(check_a(i) for i in range(a, b + 1))
+puzzle.answer_b = sum(check_b(i) for i in range(a, b + 1))
