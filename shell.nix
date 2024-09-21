@@ -3,6 +3,8 @@
 }:
 pkgs.mkShell {
   packages = with pkgs; [
+    z3
+
     (python3.withPackages (
       pyPkgs: with pyPkgs; [
         aocd
@@ -21,6 +23,7 @@ pkgs.mkShell {
         raw-strings-qq
       ]
     ))
-    z3
+
+    haskell-language-server
   ];
 }
