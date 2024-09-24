@@ -1,26 +1,14 @@
+# I LOVE MATH!!!!!!!!!!!!!! It's amazing how you can simplify this assignment
+# if you know the proper math, which I don't, but with some help of from my
+# friends we came up with this
+
 from __future__ import annotations
 
 from aocd.models import Puzzle
-from util import ints
 
 puzzle = Puzzle(2019, int("22"))
 data = puzzle.input_data
 lines = data.splitlines()
-
-
-def find_new_index(card: int, n_cards: int, lines: list[str]) -> int:
-    for line in lines:
-        if line.startswith("cut"):
-            [n] = ints(line)
-            card = (card + n_cards - n) % n_cards
-        elif line.startswith("deal with increment"):
-            [n] = ints(line)
-            card = (card * n) % n_cards
-        elif line.startswith("deal into new stack"):
-            card = (n_cards - card - 1) % n_cards
-        else:
-            raise Exception("Unknown case")
-    return card
 
 
 class Mat:
@@ -32,7 +20,26 @@ class Mat:
         self.rows = len(self.values)
         self.cols = len(self.values[0])
 
-    def matmul(self, other: Mat, mod: int) -> Mat:
+    def __repr__(self) -> str:
+        col_widths = [
+            max(len(str(self[y, x])) for y in range(self.rows))
+            for x in range(self.cols)
+        ]
+
+        return (
+            "["
+            + "\n ".join(
+                "["
+                + ", ".join(
+                    str(self[y, x]).rjust(col_widths[x]) for x in range(self.cols)
+                )
+                + "]"
+                for y in range(self.rows)
+            )
+            + "]"
+        )
+
+    def __matmul__(self, other: Mat) -> Mat:
         cols = other.cols
         rows = self.rows
 
@@ -45,22 +52,37 @@ class Mat:
 
                 for i in range(n):
                     result[y, x] += self[y, i] * other[i, x]
-                    result[y, x] %= mod
 
         return result
 
-    def pow(self, n: int, mod: int) -> Mat:
+    def __mod__(self, mod: int) -> Mat:
+        return Mat([[(v % mod) for v in row] for row in self.values])
+
+    def pow_mod(self, n: int, mod: int) -> Mat:
         assert n >= 0
 
         if n == 0:
             return Mat([[1, 0], [0, 1]])
 
-        res = self.pow(n // 2, mod)
+        res = self.pow_mod(n // 2, mod)
 
         if n % 2 == 0:
-            return res.matmul(res, mod)
+            return (res @ res) % mod
         else:
-            return res.matmul(res, mod).matmul(self, mod)
+            return (res @ res @ self) % mod
+
+    def __mul__(self, scalar: int) -> Mat:
+        return Mat([[v * scalar for v in row] for row in self.values])
+
+    def det(self) -> int:
+        assert self.cols == 2 and self.rows == 2
+        return self[0, 0] * self[1, 1] - self[0, 1] * self[1, 0]
+
+    def modular_inverse(self, mod: int) -> Mat:
+        assert self.cols == 2 and self.rows == 2
+        return Mat([[self[1, 1], -self[0, 1]], [-self[1, 0], self[0, 0]]]) * pow(
+            self.det(), -1, mod
+        )
 
     def __getitem__(self, coord: tuple[int, int]) -> int:
         y, x = coord
@@ -71,40 +93,27 @@ class Mat:
         self.values[y][x] = v
 
 
-def solve_a() -> int:
-    m = Mat([[1, 0], [0, 1]])
-    n_cards = 10_007
+A_CARDS = 10_007
+B_CARDS = 119_315_717_514_047
+B_REPETITIONS = 101_741_582_076_661
 
-    for line in data.splitlines():
-        match line.split():
-            case "cut", n:
-                m = m.matmul(Mat([[1, 0], [-int(n), 1]]), n_cards)
-            case "deal", "with", "increment", n:
-                m = m.matmul(Mat([[int(n), 0], [0, 1]]), n_cards)
-            case "deal", "into", "new", "stack":
-                m = m.matmul(Mat([[-1, 0], [-1, 1]]), n_cards)
+m = Mat([[1, 0], [0, 1]])
 
-    return Mat([[2019, 1]]).matmul(m, n_cards)[0, 0]
-
-
-def solve_b() -> int:
-    m = Mat([[1, 0], [0, 1]])
-    n_cards = 119_315_717_514_047
-
-    for line in data.splitlines()[::-1]:
-        match line.split():
-            case "cut", n:
-                m = m.matmul(Mat([[1, 0], [int(n), 1]]), n_cards)
-            case "deal", "with", "increment", n:
-                mod_inv = pow(int(n), -1, n_cards)
-                m = m.matmul(Mat([[mod_inv, 0], [0, 1]]), n_cards)
-            case "deal", "into", "new", "stack":
-                m = m.matmul(Mat([[-1, 0], [-1, 1]]), n_cards)
-
-    m = m.pow(101_741_582_076_661, n_cards)
-
-    return Mat([[2020, 1]]).matmul(m, n_cards)[0, 0]
+for line in data.splitlines():
+    match line.split():
+        case "cut", n:
+            m @= Mat([[1, 0], [-int(n), 1]])
+        case "deal", "with", "increment", n:
+            m @= Mat([[int(n), 0], [0, 1]])
+        case "deal", "into", "new", "stack":
+            m @= Mat([[-1, 0], [-1, 1]])
 
 
-puzzle.answer_a = solve_a()
-puzzle.answer_b = solve_b()
+puzzle.answer_a = (Mat([[2019, 1]]) @ m)[0, 0] % A_CARDS
+
+# Since part two is to find the new card at index 2020 instead of where 2019
+# ended up we take the modular inverse of the matrix, it's like magic.
+m2 = m.modular_inverse(B_CARDS)
+# And raise it to the power of the amount of repetitions
+m2 = m2.pow_mod(B_REPETITIONS, B_CARDS)
+puzzle.answer_b = (Mat([[2020, 1]]) @ m2)[0, 0] % B_CARDS
