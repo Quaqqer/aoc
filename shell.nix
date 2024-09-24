@@ -10,6 +10,7 @@ pkgs.mkShell {
         aocd
         pygame
         numpy
+        scipy
         z3
         networkx
       ]
