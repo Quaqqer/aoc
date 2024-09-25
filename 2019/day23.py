@@ -1,3 +1,10 @@
+# Solved it in less than 15 minutes
+# 1. I opened the problem ~12:11:20 according to firefox
+# 2. I submitted correct answer for part 1 at 12:19:59 according to aocd => ~8 minutes and 39 seconds
+# 3. I submitted correct answer for part 2 at 12:26:02 according to aocd => ~14 minutes and 42 seconds
+#
+# If this was december I would place top 50 in part 1 and top 38 in part 2, cool stuff
+
 from collections import deque
 from copy import copy
 from enum import Enum
