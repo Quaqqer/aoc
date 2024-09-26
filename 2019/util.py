@@ -101,14 +101,30 @@ class Grid[T]:
             case Vec2(x, y):
                 return self._grid[y][x]
             case x, int(y) if isinstance(x, slice):
-                return [self._grid[y][xx] for xx in range(x.start, x.stop, x.step)]
+                x_start = x.start if x.start is not None else 0
+                x_stop = x.stop if x.stop is not None else self.cols
+                x_step = x.step if x.step is not None else 1
+
+                return [self._grid[y][xx] for xx in range(x_start, x_stop, x_step)]
             case int(x), y if isinstance(y, slice):
-                return [self._grid[yy][x] for yy in range(y.start, y.stop, y.step)]
+                y_start = y.start if y.start is not None else 0
+                y_stop = y.stop if y.stop is not None else self.rows
+                y_step = y.step if y.step is not None else 1
+
+                return [self._grid[yy][x] for yy in range(y_start, y_stop, y_step)]
             case x, y if isinstance(x, slice) and isinstance(y, slice):
+                x_start = x.start if x.start is not None else 0
+                x_stop = x.stop if x.stop is not None else self.cols
+                x_step = x.step if x.step is not None else 1
+
+                y_start = y.start if y.start is not None else 0
+                y_stop = y.stop if y.stop is not None else self.rows
+                y_step = y.step if y.step is not None else 1
+
                 return Grid.from_2d_list(
                     [
-                        [self._grid[yy][xx] for xx in range(x.start, x.stop, x.step)]
-                        for yy in range(y.start, y.stop, y.step)
+                        [self._grid[yy][xx] for xx in range(x_start, x_stop, x_step)]
+                        for yy in range(y_start, y_stop, y_step)
                     ],
                 )
             case _:
@@ -129,14 +145,30 @@ class Grid[T]:
             case Vec2(x, y):
                 self.set(x, y, v)
             case x, int(y) if isinstance(x, slice):
-                for xx in range(x.start, x.stop, x.step):
+                x_start = x.start if x.start is not None else 0
+                x_stop = x.stop if x.stop is not None else self.cols
+                x_step = x.step if x.step is not None else 1
+
+                for xx in range(x_start, x_stop, x_step):
                     self.set(xx, y, v)
             case int(x), y if isinstance(y, slice):
-                for yy in range(y.start, y.stop, y.step):
+                y_start = y.start if y.start is not None else 0
+                y_stop = y.stop if y.stop is not None else self.rows
+                y_step = y.step if y.step is not None else 1
+
+                for yy in range(y_start, y_stop, y_step):
                     self.set(x, yy, v)
             case x, y if isinstance(x, slice) and isinstance(y, slice):
-                for xx in range(x.start, x.stop, x.step):
-                    for yy in range(y.start, y.stop, y.step):
+                x_start = x.start if x.start is not None else 0
+                x_stop = x.stop if x.stop is not None else self.cols
+                x_step = x.step if x.step is not None else 1
+
+                y_start = y.start if y.start is not None else 0
+                y_stop = y.stop if y.stop is not None else self.rows
+                y_step = y.step if y.step is not None else 1
+
+                for xx in range(x_start, x_stop, x_step):
+                    for yy in range(y_start, y_stop, y_step):
                         self.set(xx, yy, v)
             case _:
                 raise Exception("Invalid arguments")
