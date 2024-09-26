@@ -146,16 +146,17 @@ class IntPC:
 
 intpc = IntPC(program)
 
-# - Our robot jumps four spaces
-# - If there is a hole in space 1-3, then jump to space 4 if space 4 is not a hole
+# @
+# ##########
+#  ABCDEFGHI
 
+# Jump if A, B or C is a hole
 instructions_a = [
-    "NOT A J",  # Check for empty spaces
-    "NOT B T",
-    "OR T J",
-    "NOT C T",
-    "OR T J",
-    "AND D J",  # And make sure we can land
+    "OR A J",
+    "AND B J",
+    "AND C J",
+    "NOT J J",
+    "AND D J",
     "WALK",
 ]
 
@@ -163,3 +164,22 @@ intpc.queue_inputs(*(ord(c) for c in "\n".join(instructions_a) + "\n"))
 intpc.run()
 
 puzzle.answer_a = intpc.outputs[-1]
+
+# Jump if A, B or C is a hole iff E or H is ground
+instructions_b = [
+    "OR A J",
+    "AND B J",
+    "AND C J",
+    "NOT J J",
+    "AND D J",
+    "OR E T",
+    "OR H T",
+    "AND T J",
+    "RUN",
+]
+
+intpc = IntPC(program)
+intpc.queue_inputs(*(ord(c) for c in "\n".join(instructions_b) + "\n"))
+intpc.run()
+
+puzzle.answer_b = intpc.outputs[-1]
