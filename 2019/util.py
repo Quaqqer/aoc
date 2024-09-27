@@ -347,7 +347,7 @@ def print_set_grid(
     maxy: int = max(ys) if max_y is None else max_y - 1
 
     get = (
-        (lambda k: "#" if k in grid else empty)
+        (lambda k: "█" if k in grid else empty)
         if isinstance(grid, set)
         else (lambda k: str(grid.get(k, empty)))  # type: ignore
     )
