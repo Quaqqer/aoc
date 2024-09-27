@@ -124,9 +124,7 @@ intpc = IntPC(program)
 
 
 def powerset[T](l: set[T]) -> Iterable[set[T]]:
-    yield set()
-    for i in range(1, len(l)):
-        yield from (set(p) for p in itertools.combinations(l, i))
+    return (set(p) for i in range(len(l) + 1) for p in itertools.combinations(l, i))
 
 
 def find_password() -> int:
