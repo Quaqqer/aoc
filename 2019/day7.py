@@ -16,11 +16,6 @@ def run_a(phases: tuple[int, int, int, int, int]) -> int:
     return v
 
 
-# puzzle.answer_a = max(
-#     run_a(phases) for phases in itertools.permutations([0, 1, 2, 3, 4, 5], 5)
-# )
-
-
 def run_b(phases: tuple[int, int, int, int, int]) -> int:
     pcs = [IntPC(program, [phase]) for phase in phases]
 
@@ -39,6 +34,10 @@ def run_b(phases: tuple[int, int, int, int, int]) -> int:
 
             i = (i + 1) % 5
 
+
+puzzle.answer_a = max(
+    run_a(phases) for phases in itertools.permutations([0, 1, 2, 3, 4, 5], 5)
+)
 
 puzzle.answer_b = max(
     run_b(phases) for phases in itertools.permutations([5, 6, 7, 8, 9], 5)

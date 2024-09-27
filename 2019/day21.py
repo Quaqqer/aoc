@@ -1,5 +1,3 @@
-import textwrap
-
 import util
 from aocd.models import Puzzle
 from intpc import IntPC

@@ -214,3 +214,7 @@ class IntPC:
     def clear_outputs(self):
         """Clear the outputs"""
         self.outputs = []
+
+    @property
+    def is_halted(self) -> bool:
+        return self.state == State.HALTED

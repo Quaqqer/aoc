@@ -30,9 +30,8 @@ def solve_a() -> int:
                 pc.queue_input([-1])
             else:
                 pc.queue_input(input)
-            pc.run()
 
-            for to, x, y in util.chunk(pc.consume_outputs(), 3):
+            for to, x, y in util.chunk(pc.io([]), 3):
                 if to == 255:
                     return y
 
@@ -67,9 +66,8 @@ def solve_b() -> int:
                 pc.queue_input([-1])
             else:
                 pc.queue_input(input)
-            pc.run()
 
-            for to, x, y in util.chunk(pc.consume_outputs(), 3):
+            for to, x, y in util.chunk(pc.io([]), 3):
                 if to == 255:
                     nat_x, nat_y = x, y
                 else:
