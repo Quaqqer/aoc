@@ -112,25 +112,16 @@ class Grid[T]:
             case Vec2(x, y):
                 return self._grid[y][x]
             case x, int(y) if isinstance(x, slice):
-                x_start = x.start if x.start is not None else 0
-                x_stop = x.stop if x.stop is not None else self.cols
-                x_step = x.step if x.step is not None else 1
+                x_start, x_stop, x_step = x.indices(self.cols)
 
                 return [self._grid[y][xx] for xx in range(x_start, x_stop, x_step)]
             case int(x), y if isinstance(y, slice):
-                y_start = y.start if y.start is not None else 0
-                y_stop = y.stop if y.stop is not None else self.rows
-                y_step = y.step if y.step is not None else 1
+                y_start, y_stop, y_step = y.indices(self.rows)
 
                 return [self._grid[yy][x] for yy in range(y_start, y_stop, y_step)]
             case x, y if isinstance(x, slice) and isinstance(y, slice):
-                x_start = x.start if x.start is not None else 0
-                x_stop = x.stop if x.stop is not None else self.cols
-                x_step = x.step if x.step is not None else 1
-
-                y_start = y.start if y.start is not None else 0
-                y_stop = y.stop if y.stop is not None else self.rows
-                y_step = y.step if y.step is not None else 1
+                x_start, x_stop, x_step = x.indices(self.cols)
+                y_start, y_stop, y_step = y.indices(self.rows)
 
                 return Grid.from_2d_list(
                     [
@@ -156,27 +147,18 @@ class Grid[T]:
             case Vec2(x, y):
                 self.set(x, y, v)
             case x, int(y) if isinstance(x, slice):
-                x_start = x.start if x.start is not None else 0
-                x_stop = x.stop if x.stop is not None else self.cols
-                x_step = x.step if x.step is not None else 1
+                x_start, x_stop, x_step = x.indices(self.cols)
 
                 for xx in range(x_start, x_stop, x_step):
                     self.set(xx, y, v)
             case int(x), y if isinstance(y, slice):
-                y_start = y.start if y.start is not None else 0
-                y_stop = y.stop if y.stop is not None else self.rows
-                y_step = y.step if y.step is not None else 1
+                y_start, y_stop, y_step = y.indices(self.rows)
 
                 for yy in range(y_start, y_stop, y_step):
                     self.set(x, yy, v)
             case x, y if isinstance(x, slice) and isinstance(y, slice):
-                x_start = x.start if x.start is not None else 0
-                x_stop = x.stop if x.stop is not None else self.cols
-                x_step = x.step if x.step is not None else 1
-
-                y_start = y.start if y.start is not None else 0
-                y_stop = y.stop if y.stop is not None else self.rows
-                y_step = y.step if y.step is not None else 1
+                x_start, x_stop, x_step = x.indices(self.cols)
+                y_start, y_stop, y_step = y.indices(self.rows)
 
                 for xx in range(x_start, x_stop, x_step):
                     for yy in range(y_start, y_stop, y_step):
@@ -348,16 +330,16 @@ class Grid[T]:
     def rotate_right(self) -> Grid[T]:
         return Grid.from_2d_list(
             [
-                [self[y, self.cols - 1 - x] for x in range(self.cols)]
-                for y in range(self.rows)
+                [self[y, self.rows - 1 - x] for x in range(self.rows)]
+                for y in range(self.cols)
             ]
         )
 
     def rotate_left(self) -> Grid[T]:
         return Grid.from_2d_list(
             [
-                [self[self.rows - 1 - y, x] for x in range(self.cols)]
-                for y in range(self.rows)
+                [self[self.cols - 1 - y, x] for x in range(self.rows)]
+                for y in range(self.cols)
             ]
         )
 
