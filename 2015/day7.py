@@ -1,14 +1,6 @@
-import functools
-import itertools
-import math
-import re
-from collections import Counter, defaultdict, deque
-from copy import copy, deepcopy
-from dataclasses import dataclass
+from collections import deque
 
-import util
 from aocd.models import Puzzle
-from util import Vec2, Vec3, ints
 
 puzzle = Puzzle(2015, int("7"))
 data = puzzle.input_data
