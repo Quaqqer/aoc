@@ -6,7 +6,7 @@ puzzle = Puzzle(2015, int("12"))
 data = puzzle.input_data
 lines = data.splitlines()
 
-type Json = int | list[Json] | dict[str, Json] | str
+type Json = int | list[Json] | dict[str, Json] | str | bool | None
 
 
 def count_numbers(data: Json, skip_red=False) -> int:
@@ -22,7 +22,7 @@ def count_numbers(data: Json, skip_red=False) -> int:
                 )
             case int(n):
                 return n
-            case str(_):
+            case str(_) | bool(_) | None:
                 return 0
 
     return inner(data)
