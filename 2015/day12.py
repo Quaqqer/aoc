@@ -10,22 +10,19 @@ type Json = int | list[Json] | dict[str, Json] | str | bool | None
 
 
 def count_numbers(data: Json, skip_red=False) -> int:
-    def inner(data: Json):
-        match data:
-            case list(l):
-                return sum(inner(e) for e in l)
-            case dict(d):
-                return (
-                    0
-                    if skip_red and "red" in d.values()
-                    else sum(inner(e) for e in d.values())
-                )
-            case int(n):
-                return n
-            case str(_) | bool(_) | None:
-                return 0
-
-    return inner(data)
+    match data:
+        case list(l):
+            return sum(count_numbers(e, skip_red) for e in l)
+        case dict(d):
+            return (
+                0
+                if skip_red and "red" in d.values()
+                else sum(count_numbers(e, skip_red) for e in d.values())
+            )
+        case int(n):
+            return n
+        case str(_) | bool(_) | None:
+            return 0
 
 
 puzzle.answer_a = count_numbers(json.loads(data))
