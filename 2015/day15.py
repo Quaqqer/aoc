@@ -9,6 +9,7 @@ data = puzzle.input_data
 lines = data.splitlines()
 
 cookies = [ints(line) for line in lines]
+assert len(cookies) == 4
 
 
 def cookie_combination() -> Iterable[tuple[int, int]]:
