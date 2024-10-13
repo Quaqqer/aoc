@@ -29,17 +29,15 @@ def min_containers(space: int, i=0) -> int | None:
     if i == len(containers):
         return None
 
-    ans: int | None = None
+    ans: list[int] = []
 
-    if_used_containers = min_containers(space - containers[i], i + 1)
-    if if_used_containers is not None:
-        ans = if_used_containers + 1
+    if (used := min_containers(space - containers[i], i + 1)) is not None:
+        ans.append(used + 1)
 
-    if_unused_containers = min_containers(space, i + 1)
-    if if_unused_containers is not None and (ans is None or if_unused_containers < ans):
-        ans = if_unused_containers
+    if (unused := min_containers(space, i + 1)) is not None:
+        ans.append(unused)
 
-    return ans
+    return None if ans == [] else min(ans)
 
 
 puzzle.answer_a = container_combinations(150)
