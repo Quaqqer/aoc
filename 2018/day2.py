@@ -8,27 +8,22 @@ puzzle = Puzzle(2018, int("2"))
 data = puzzle.input_data
 lines = data.splitlines()
 
-doubles = 0
-triples = 0
-for line in lines:
-    if 2 in Counter(line).values():
-        doubles += 1
-    if 3 in Counter(line).values():
-        triples += 1
-
+doubles = sum(2 in Counter(line).values() for line in lines)
+triples = sum(3 in Counter(line).values() for line in lines)
 puzzle.answer_a = doubles * triples
 
-for a in lines:
-    for b in lines:
-        sames = ""
-        diffs = 0
-        for aa, bb in zip(a, b):
-            if aa == bb:
-                sames += aa
-            if aa != bb:
-                diffs += 1
 
-                if diffs > 1:
-                    break
-        if diffs == 1:
-            puzzle.answer_b = sames
+def solve_b():
+    for i in range(len(lines)):
+        for j in range(i + 1, len(lines)):
+            a, b = lines[i], lines[j]
+
+            diffs = sum(ac != bc for ac, bc in zip(a, b))
+
+            if diffs == 1:
+                return "".join(ac for ac, bc in zip(a, b) if ac == bc)
+
+    raise Exception("No solution")
+
+
+puzzle.answer_b = solve_b()
