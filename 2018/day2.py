@@ -1,4 +1,4 @@
-# Solved both parts in 3:16:11
+# Solved both parts in 3:16
 
 from collections import Counter
 
