@@ -14,10 +14,8 @@ puzzle.answer_a = doubles * triples
 
 
 def solve_b():
-    for i in range(len(lines)):
-        for j in range(i + 1, len(lines)):
-            a, b = lines[i], lines[j]
-
+    for a in lines:
+        for b in lines:
             diffs = sum(ac != bc for ac, bc in zip(a, b))
 
             if diffs == 1:
