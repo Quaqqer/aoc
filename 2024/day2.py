@@ -20,5 +20,5 @@ def safe(ns: Sequence[int]):
 
 puzzle.answer_a = sum(safe(ns) for ns in nss)
 puzzle.answer_b = sum(
-    safe(ns) or any(safe(ns[:i] + ns[i + 1 :]) for i in range(len(ns))) for ns in nss
+    any(safe(ns[:i] + ns[i + 1 :]) for i in range(len(ns))) for ns in nss
 )
