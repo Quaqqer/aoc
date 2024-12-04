@@ -543,8 +543,17 @@ class Vec2[T: (int, float)]:
     def __sub__(self, other: Vec2[T]) -> Vec2[T]:
         return Vec2(self.__x - other.__x, self.__y - other.__y)
 
-    def __mul__(self, other: Vec2[T]) -> Vec2[T]:
-        return Vec2(self.__x * other.__x, self.__y * other.__y)
+    def __mul__(self, other: Vec2[T] | int | float) -> Vec2[T]:
+        match other:
+            case Vec2(x, y):
+                return Vec2(self.__x * x, self.y * y)
+            case int(v) | float(v):
+                return Vec2(self.__x * v, self.__y * v)
+            case _:
+                raise NotImplementedError()
+
+    def __rmul__(self, other: Vec2[T] | int) -> Vec2[T]:
+        return self * other
 
     def __div__(self, other: Vec2[T]) -> Vec2[float]:
         return Vec2(self.__x / other.__x, self.__y / other.__y)
@@ -644,6 +653,8 @@ class Vec3[T: (int, float)]:
         self.__y = y
         self.__z = z
 
+    __match_args__ = ("x", "y", "z")
+
     @property
     def x(self) -> T:
         return self.__x
@@ -662,8 +673,17 @@ class Vec3[T: (int, float)]:
     def __sub__(self, other: Vec3[T]) -> Vec3[T]:
         return Vec3(self.__x - other.__x, self.__y - other.__y, self.__z - other.__z)
 
-    def __mul__(self, other: Vec3[T]) -> Vec3[T]:
-        return Vec3(self.__x * other.__x, self.__y * other.__y, self.__z * other.__z)
+    def __mul__(self, other: Vec3[T] | int | float) -> Vec3[T]:
+        match other:
+            case Vec3(x, y, z):
+                return Vec3(self.__x * x, self.__y * y, self.__z * z)
+            case int(v) | float(v):
+                return Vec3(self.__x * v, self.__y * v, self.__z * v)
+            case _:
+                raise NotImplementedError()
+
+    def __rmul__(self, other: Vec3[T] | int | float) -> Vec3[T]:
+        return self * other
 
     def __div__(self, other: Vec3[T]) -> Vec3[float]:
         return Vec3(self.__x / other.__x, self.__y / other.__y, self.__z / other.__z)
