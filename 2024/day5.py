@@ -4,6 +4,7 @@
 # that 1 comes before 2 and 2 comes before 3 it's reasonable to expect that 3
 # comes after 1. It worked in the example input also... :'(
 
+import functools
 from collections import defaultdict
 from typing import Sequence
 
@@ -26,34 +27,16 @@ for rule in ruless:
 
 
 def correct_order(s: Sequence[int]):
-    for i in range(len(s)):
-        for j in range(i + 1, len(s)):
-            a, b = s[i], s[j]
-            if b in r[a]:
-                return False
-    return True
+    return not any(s[j] in r[s[i]] for i in range(len(s)) for j in range(i + 1, len(s)))
 
 
 def order_correctly(s: Sequence[int]) -> list[int]:
-    n = []
-
-    def insert(i):
-        v = s[i]
-        if v in n:
-            return
-        for c in ri[v]:
-            if c in s:
-                insert(s.index(c))
-        n.append(v)
-
-    for i in range(len(s)):
-        insert(i)
-
-    return n
+    # Thanks for the idea Axel
+    return sorted(s, key=functools.cmp_to_key(lambda a, b: -1 if a in r[b] else 0))
 
 
 a = sum(s[len(s) // 2] for s in tests if correct_order(s))
+b = sum(oc[len(oc) // 2] for oc in (order_correctly(s) for s in tests)) - a
+
 puzzle.answer_a = a
-puzzle.answer_b = (
-    sum(oc[len(oc) // 2] for oc in (order_correctly(s) for s in tests)) - a
-)
+puzzle.answer_b = b
