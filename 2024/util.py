@@ -4,7 +4,6 @@ import heapq
 import math
 import re
 from collections import deque
-from copy import deepcopy
 from typing import (
     Callable,
     Iterable,
@@ -22,14 +21,14 @@ type Coord = tuple[int, int]
 class Grid[T]:
     """A 2D grid of type T"""
 
-    def __init__(self, cols: int, rows: int, _grid: list[list[T]]):
+    def __init__(self, cols: int, rows: int, _grid: list[T]):
         self._cols = cols
         self._rows = rows
-        # Index by _grid[y][x]
+        # Index by _grid[x + y * cols]
         self._grid = _grid
 
     def copy(self) -> Grid[T]:
-        return Grid(cols=self._cols, rows=self._rows, _grid=deepcopy(self._grid))
+        return Grid(cols=self._cols, rows=self._rows, _grid=self._grid.copy())
 
     def __repr__(self) -> str:
         is_strs = all(isinstance(self[x, y], str) for x, y in self.coords())
@@ -77,7 +76,7 @@ class Grid[T]:
         if (x, y) not in self:
             return default
 
-        return self._grid[y][x]
+        return self._grid[x + y * self.cols]
 
     def set(self, x: int, y: int, v: T):
         """Set an item in the grid.
@@ -87,7 +86,7 @@ class Grid[T]:
             y: The y position
             v: The value
         """
-        self._grid[y][x] = v
+        self._grid[x + y * self.cols] = v
 
     @overload
     def __getitem__(self, index: tuple[int, int] | Vec2[int]) -> T: ...
@@ -107,22 +106,26 @@ class Grid[T]:
             coord: (x, y) coordinate
         """
         match index:
-            case int(x), int(y):
-                return self._grid[y][x]
-            case Vec2(x, y):
-                return self._grid[y][x]
+            case (int(x), int(y)) | Vec2(x, y):
+                return self._grid[x + y * self.cols]
             case x, int(y) if isinstance(x, slice):
                 x_start = x.start if x.start is not None else 0
                 x_stop = x.stop if x.stop is not None else self.cols
                 x_step = x.step if x.step is not None else 1
 
-                return [self._grid[y][xx] for xx in range(x_start, x_stop, x_step)]
+                return [
+                    self._grid[xx + y * self.cols]
+                    for xx in range(x_start, x_stop, x_step)
+                ]
             case int(x), y if isinstance(y, slice):
                 y_start = y.start if y.start is not None else 0
                 y_stop = y.stop if y.stop is not None else self.rows
                 y_step = y.step if y.step is not None else 1
 
-                return [self._grid[yy][x] for yy in range(y_start, y_stop, y_step)]
+                return [
+                    self._grid[x + yy * self.cols]
+                    for yy in range(y_start, y_stop, y_step)
+                ]
             case x, y if isinstance(x, slice) and isinstance(y, slice):
                 x_start = x.start if x.start is not None else 0
                 x_stop = x.stop if x.stop is not None else self.cols
@@ -134,7 +137,10 @@ class Grid[T]:
 
                 return Grid.from_2d_list(
                     [
-                        [self._grid[yy][xx] for xx in range(x_start, x_stop, x_step)]
+                        [
+                            self._grid[xx + yy * self.cols]
+                            for xx in range(x_start, x_stop, x_step)
+                        ]
                         for yy in range(y_start, y_stop, y_step)
                     ],
                 )
@@ -151,9 +157,7 @@ class Grid[T]:
             v: Value
         """
         match index:
-            case int(x), int(y):
-                self.set(x, y, v)
-            case Vec2(x, y):
+            case (int(x), int(y)) | Vec2(x, y):
                 self.set(x, y, v)
             case x, int(y) if isinstance(x, slice):
                 x_start = x.start if x.start is not None else 0
@@ -178,8 +182,8 @@ class Grid[T]:
                 y_stop = y.stop if y.stop is not None else self.rows
                 y_step = y.step if y.step is not None else 1
 
-                for xx in range(x_start, x_stop, x_step):
-                    for yy in range(y_start, y_stop, y_step):
+                for yy in range(y_start, y_stop, y_step):
+                    for xx in range(x_start, x_stop, x_step):
                         self.set(xx, yy, v)
             case _:
                 raise Exception("Invalid arguments")
@@ -188,25 +192,21 @@ class Grid[T]:
         return Grid(
             self.cols,
             self.rows,
-            [[fn(self[x, y]) for x in range(self.cols)] for y in range(self.rows)],
+            [fn(self[x, y]) for x in range(self.cols) for y in range(self.rows)],
         )
 
     def map_with_pos[U](self, fn: Callable[[tuple[int, int], T], U]) -> Grid[U]:
         return Grid(
             self.cols,
             self.rows,
-            [
-                [fn((x, y), self[x, y]) for x in range(self.cols)]
-                for y in range(self.rows)
-            ],
+            [fn((i % self.cols, i // self.cols), v) for i, v in enumerate(self._grid)],
         )
 
     def transpose(self) -> Grid[T]:
-        return Grid(
-            self.rows,
-            self.cols,
-            [[self[y, x] for y in range(self.rows)] for x in range(self.cols)],
-        )
+        g = Grid.new_fill(lambda: None, self.cols, self.rows)
+        for x, y in self.coords():
+            g[y, x] = self[x, y]
+        return g
 
     @staticmethod
     def new_fill(fill: Callable[[], T], cols: int, rows: int) -> Grid[T]:
@@ -221,7 +221,7 @@ class Grid[T]:
         cols = len(lines[0])
         assert all(cols == len(l) for l in lines)
 
-        return Grid(cols, rows, [[c for c in l] for l in lines])
+        return Grid(cols, rows, [c for l in lines for c in l])
 
     @staticmethod
     def from_2d_list(l: list[list[T]]) -> Grid[T]:
@@ -230,7 +230,7 @@ class Grid[T]:
         cols = len(l[0])
         assert all(cols == len(ll) for ll in l)
 
-        return Grid(cols, rows, [[c for c in ll] for ll in l])
+        return Grid(cols, rows, [elem for row in l for elem in row])
 
     def dfs(
         self,
@@ -311,8 +311,8 @@ class Grid[T]:
                     yield nx, ny
 
     def coords(self) -> Iterator[tuple[int, int]]:
-        for x in range(self.cols):
-            for y in range(self.rows):
+        for y in range(self.rows):
+            for x in range(self.cols):
                 yield x, y
 
     def values(self) -> Iterator[T]:
@@ -323,7 +323,7 @@ class Grid[T]:
         return self.coords()
 
     def __hash__(self):
-        return hash(tuple(tuple(c for c in r) for r in self._grid))
+        return hash(tuple(self._grid))
 
     def __eq__(self, other: object):
         if not isinstance(other, Grid):
@@ -593,6 +593,10 @@ class Vec2[T: (int, float)]:
 
     def to_tuple(self) -> tuple[T, T]:
         return (self.__x, self.__y)
+
+    def __iter__(self) -> Iterator[T]:
+        yield self.__x
+        yield self.__y
 
     @property
     def tup(self) -> tuple[T, T]:
