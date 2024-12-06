@@ -19,11 +19,9 @@ ruless, tests = [[ints(l) for l in ls.splitlines()] for ls in data.split("\n\n")
 
 
 r = defaultdict(list)
-ri = defaultdict(list)
 for rule in ruless:
     a, b = rule
     r[b].append(a)
-    ri[a].append(b)
 
 
 def correct_order(s: Sequence[int]):
