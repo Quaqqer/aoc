@@ -23,11 +23,10 @@ def solve_a():
     g = Grid.from_lines(data)
 
     for freq in freqs.values():
-        for a, b in itertools.combinations(freq, 2):
-            if (an := a * 2 - b) in g:
-                g[an] = "#"
-            if (an := b * 2 - a) in g:
-                g[an] = "#"
+        for a, b in itertools.permutations(freq, 2):
+            p = b * 2 - a
+            if p in g:
+                g[p] = "#"
     return len(list(g.find_value("#")))
 
 
@@ -35,12 +34,12 @@ def solve_b():
     g = Grid.from_lines(data)
 
     for freq in freqs.values():
-        for a, b in itertools.combinations(freq, 2):
-            for pos, delta in [(a, b - a), (b, a - b)]:
+        for a, b in itertools.permutations(freq, 2):
+            delta = b - a
+            pos = a + delta
+            while pos in g:
+                g[pos] = "#"
                 pos += delta
-                while pos in g:
-                    g[pos] = "#"
-                    pos += delta
     return len(list(g.find_value("#")))
 
 
