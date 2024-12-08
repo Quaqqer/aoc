@@ -543,7 +543,7 @@ class Vec2[T: (int, float)]:
     def __sub__(self, other: Vec2[T]) -> Vec2[T]:
         return Vec2(self.__x - other.__x, self.__y - other.__y)
 
-    def __mul__(self, other: Vec2[T] | int | float) -> Vec2[T]:
+    def __mul__(self, other: Vec2[T] | T) -> Vec2[T]:
         match other:
             case Vec2(x, y):
                 return Vec2(self.__x * x, self.y * y)
@@ -552,7 +552,7 @@ class Vec2[T: (int, float)]:
             case _:
                 raise NotImplementedError()
 
-    def __rmul__(self, other: Vec2[T] | int) -> Vec2[T]:
+    def __rmul__(self, other: Vec2[T] | T) -> Vec2[T]:
         return self * other
 
     def __div__(self, other: Vec2[T]) -> Vec2[float]:
