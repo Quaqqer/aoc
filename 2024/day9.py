@@ -1,5 +1,5 @@
 # 9   00:14:17   997      0   01:12:06  3305      0
-# Pretty hard day, easy to get wrong
+# Pretty hard day, very easy to get one off errors.
 
 from typing import Literal
 
@@ -8,7 +8,6 @@ from aocd.models import Puzzle
 puzzle = Puzzle(2024, int("09"))
 
 data = puzzle.input_data
-data = "2333133121414131402"
 
 
 def parse() -> list[int | Literal["."]]:
@@ -58,7 +57,7 @@ def solve_b():
             r -= 1
             continue
 
-        # Find the size of the right chunk
+        # Find the size of the right chunk, and decrement r to the start of it
         rsize = 1
         while fs[r - 1] == fs[r]:
             rsize += 1
@@ -66,34 +65,33 @@ def solve_b():
 
         # Find a left chunk to swap
         l = 0
-        found = False
-        while l < r and not found:
-            if fs[l] == ".":
-                lsize = 1
-                while fs[l + lsize] == ".":
-                    lsize += 1
-                if rsize <= lsize:
-                    found = True
-                    break
-                else:
-                    l += lsize
-            else:
+        while l < r:
+            # If it's not empty, skip
+            if fs[l] != ".":
                 l += 1
+                continue
 
-        if found:
-            for i in range(rsize):
-                fs[l + i] = fs[r + i]
-                fs[r + i] = "."
-            r -= rsize
-        else:
-            r -= 1
+            # Increment while we find more dots
+            lsize = 1
+            while fs[l + lsize] == ".":
+                lsize += 1
+
+            # If we find space, move it
+            # Check if we found it
+            if rsize <= lsize:
+                for i in range(rsize):
+                    fs[l + i] = fs[r + i]
+                    fs[r + i] = "."
+                break
+            else:
+                l += lsize
+
+        r -= 1
+
+    print("".join(map(str, fs)))
 
     return hash(fs)
 
 
-a = solve_a()
-print(a)
-puzzle.answer_a = a
-b = solve_b()
-print(b)
-puzzle.answer_b = b
+puzzle.answer_a = solve_a()
+puzzle.answer_b = solve_b()
