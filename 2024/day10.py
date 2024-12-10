@@ -2,6 +2,8 @@
 # I accidentally implemented part 2 in part 1, so to solve part 2 I just had to
 # press the undo key.
 
+import functools
+
 from aocd.models import Puzzle
 from util import Grid
 
@@ -12,6 +14,7 @@ data = puzzle.input_data
 g = Grid.from_lines(data).map(int)
 
 
+@functools.cache
 def n_tops(pos: tuple[int, int]) -> set[tuple[int, int]]:
     height = g[pos]
     if height == 9:
@@ -23,6 +26,7 @@ def n_tops(pos: tuple[int, int]) -> set[tuple[int, int]]:
     return s
 
 
+@functools.cache
 def n_trails(pos: tuple[int, int]) -> int:
     height = g[pos]
     if height == 9:
