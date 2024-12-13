@@ -415,6 +415,10 @@ def ints(src: str | Iterable[str]) -> list[int]:
             return list(map(int, src))
 
 
+def floats(src: str) -> list[float]:
+    return list(map(float, re.findall(r"[+-]?(?:\d+(?:\.\d+)?|(?:\.\d+))", src)))
+
+
 class Range:
     """Range [start, end)"""
 
