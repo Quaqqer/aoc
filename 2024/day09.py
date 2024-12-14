@@ -88,8 +88,6 @@ def solve_b():
 
         r -= 1
 
-    print("".join(map(str, fs)))
-
     return hash(fs)
 
 
