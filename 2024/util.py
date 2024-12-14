@@ -565,6 +565,15 @@ class Vec2[T: (int, float)]:
     def __floordiv__(self, other: Vec2[T]) -> Vec2[T]:
         return Vec2(self.__x // other.__x, self.__y // other.__y)
 
+    def __mod__(self, other: T | Vec2[T]) -> Vec2[T]:
+        match other:
+            case Vec2(x, y):
+                return Vec2(self.x % x, self.y % y)
+            case int(v) | float(v):
+                return Vec2(self.x % v, self.y % v)
+            case _:
+                raise NotImplementedError()
+
     def __lt__(self, other: Vec2[T]) -> bool:
         return self.to_tuple() < other.to_tuple()
 
