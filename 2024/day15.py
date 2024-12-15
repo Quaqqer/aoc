@@ -9,17 +9,26 @@ puzzle = Puzzle(2024, int("15"))
 
 data = puzzle.input_data
 
+DIR_MAP = {"^": Vec2(0, -1), "<": Vec2(-1, 0), ">": Vec2(1, 0), "v": Vec2(0, 1)}
 
-def solve_a():
-    g, instructions = data.split("\n\n")
-    g = Grid.from_lines(g)
-    [pos] = map(Vec2, g.find_value("@"))
-    g[pos] = "."
+g, instructions = data.split("\n\n")
+instructions = "".join(instructions.splitlines())
+g = Grid.from_lines(g)
+[start] = map(Vec2, g.find_value("@"))
+g[start] = "."
 
-    for instruction in "".join(instructions.splitlines()):
-        dir = {"^": Vec2(0, -1), "<": Vec2(-1, 0), ">": Vec2(1, 0), "v": Vec2(0, 1)}[
-            instruction
-        ]
+g2 = Grid.new_fill(lambda: ".", g.cols * 2, g.rows)
+for p in map(Vec2, g):
+    l, r = {"#": "##", "O": "[]", ".": ".."}[g[p]]
+    g2[p * Vec2(2, 1)] = l
+    g2[p * Vec2(2, 1) + Vec2(1, 0)] = r
+
+
+def solve_a(g: Grid[str], start: Vec2[int]):
+    pos = start
+
+    for instruction in instructions:
+        dir = DIR_MAP[instruction]
 
         n = pos + dir
         if g[n] == ".":
@@ -28,67 +37,54 @@ def solve_a():
             continue
         elif g[n] == "O":
             boxes = 1
-            can_move = False
-            while g[pos + dir * boxes]:
-                nn = pos + dir * boxes
-                if g[nn] == "O":
-                    boxes += 1
-                elif g[nn] == "#":
-                    can_move = False
-                    break
-                elif g[nn] == ".":
-                    can_move = True
-                    break
-            if can_move:
+            while g[pos + dir * boxes] == "O":
+                boxes += 1
+            if g[pos + dir * boxes] == ".":
                 for box in range(boxes)[::-1]:
                     g[pos + dir * (box + 1)] = "O"
                     g[pos + dir * box] = "."
                 pos = n
+                # Don't know why I need to do this...
+                g[pos] = "."
 
     return sum(100 * y + x for x, y in g.find_value("O"))
 
 
-def solve_b():
-    _g, instructions = data.split("\n\n")
-
-    _g = Grid.from_lines(_g)
-    [start] = map(Vec2, _g.find_value("@"))
-    _g[start] = "."
-
-    def can_move_boxes(box_pos: Vec2, dir: Vec2) -> bool:
+def solve_b(g: Grid[str], start: Vec2[int]):
+    def can_push_box(box_pos: Vec2, dir: Vec2) -> bool:
         if g[box_pos] == "]":
             box_pos -= Vec2(1, 0)
 
         can_move = True
         if dir.y != 0:
             if g[box_pos + dir] in "[]":
-                can_move &= can_move_boxes(box_pos + dir, dir)
+                can_move &= can_push_box(box_pos + dir, dir)
             if g[box_pos + dir + Vec2(1, 0)] == "[":  # ]
-                can_move &= can_move_boxes(box_pos + dir + Vec2(1, 0), dir)
+                can_move &= can_push_box(box_pos + dir + Vec2(1, 0), dir)
             if g[box_pos + dir] == "#" or g[box_pos + dir + Vec2(1, 0)] == "#":
                 can_move = False
         else:
             if dir.x == 1:
                 if g[box_pos + dir * 2] == "[":  # ]
-                    can_move &= can_move_boxes(box_pos + dir * 2, dir)
+                    can_move &= can_push_box(box_pos + dir * 2, dir)
                 if g[box_pos + dir * 2] == "#":
                     can_move = False
             else:
                 if g[box_pos + dir] == "]":
-                    can_move &= can_move_boxes(box_pos + dir, dir)
+                    can_move &= can_push_box(box_pos + dir, dir)
                 if g[box_pos + dir] == "#":
                     can_move = False
         return can_move
 
-    def move_boxes(box_pos: Vec2, dir: Vec2):
+    def push_box(box_pos: Vec2, dir: Vec2):
         if g[box_pos] == "]":
             box_pos -= Vec2(1, 0)
 
         if dir.y != 0:
             if g[box_pos + dir] in "[]":
-                move_boxes(box_pos + dir, dir)
+                push_box(box_pos + dir, dir)
             if g[box_pos + dir + Vec2(1, 0)] == "[":  # ]
-                move_boxes(box_pos + dir + Vec2(1, 0), dir)
+                push_box(box_pos + dir + Vec2(1, 0), dir)
 
             g[box_pos + dir] = "["
             g[box_pos + dir + Vec2(1, 0)] = "]"
@@ -97,7 +93,7 @@ def solve_b():
         else:
             if dir.x == 1:
                 if g[box_pos + dir * 2] == "[":  # ]
-                    move_boxes(box_pos + dir * 2, dir)
+                    push_box(box_pos + dir * 2, dir)
                 g[box_pos], g[box_pos + Vec2(1, 0)], g[box_pos + Vec2(2, 0)] = (
                     ".",
                     "[",
@@ -105,7 +101,7 @@ def solve_b():
                 )
             elif dir.x == -1:
                 if g[box_pos + dir * 2] == "[":  # ]
-                    move_boxes(box_pos + dir * 2, dir)
+                    push_box(box_pos + dir * 2, dir)
                 (
                     g[box_pos + Vec2(-1, 0)],
                     g[box_pos],
@@ -116,20 +112,9 @@ def solve_b():
                     ".",
                 )
 
-    g = Grid.new_fill(lambda: ".", _g.cols * 2, _g.rows)
-    for p in map(Vec2, _g):
-        if _g[p] == "#":
-            g[p * Vec2(2, 1)] = "#"
-            g[p * Vec2(2, 1) + Vec2(1, 0)] = "#"
-        elif _g[p] == "O":
-            g[p * Vec2(2, 1)] = "["
-            g[p * Vec2(2, 1) + Vec2(1, 0)] = "]"
-
-    pos = start * Vec2(2, 1)
-    for instruction in "".join(instructions.splitlines()):
-        dir = {"^": Vec2(0, -1), "<": Vec2(-1, 0), ">": Vec2(1, 0), "v": Vec2(0, 1)}[
-            instruction
-        ]
+    pos = start
+    for instruction in instructions:
+        dir = DIR_MAP[instruction]
 
         n = pos + dir
         if g[n] == ".":
@@ -137,11 +122,11 @@ def solve_b():
         elif g[n] == "#":
             continue
         elif g[n] in ["[", "]"]:
-            if can_move_boxes(n, dir):
-                move_boxes(n, dir)
+            if can_push_box(n, dir):
+                push_box(n, dir)
                 pos = n
     return sum(y * 100 + x for x, y in g.find_value("["))
 
 
-puzzle.answer_a = solve_a()
-puzzle.answer_b = solve_b()
+puzzle.answer_a = solve_a(g.copy(), start)
+puzzle.answer_b = solve_b(g2.copy(), start * Vec2(2, 1))
