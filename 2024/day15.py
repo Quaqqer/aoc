@@ -83,16 +83,14 @@ def solve_b(g: Grid[str], start: Vec2[int]):
     for instruction in instructions:
         dir = DIR_MAP[instruction]
 
-        n = pos + dir
-        if g[n] == ".":
-            pos = n
-        elif g[n] == "#":
-            continue
-        elif g[n] in "[]":
-            gc = g.copy()
-            if push_box_b(gc, n, dir):
-                g = gc
-                pos = n
+        match g[pos + dir]:
+            case '.':
+                pos += dir
+            case c if c in "[]":
+                gc = g.copy()
+                if push_box_b(gc, pos + dir, dir):
+                    g = gc
+                    pos += dir
     return sum(y * 100 + x for x, y in g.find_value("["))
 
 
