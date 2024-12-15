@@ -30,22 +30,18 @@ def solve_a(g: Grid[str], start: Vec2[int]):
     for instruction in instructions:
         dir = DIR_MAP[instruction]
 
-        n = pos + dir
-        if g[n] == ".":
-            pos = n
-        elif g[n] == "#":
-            continue
-        elif g[n] == "O":
-            boxes = 1
-            while g[pos + dir * boxes] == "O":
-                boxes += 1
-            if g[pos + dir * boxes] == ".":
-                for box in range(boxes)[::-1]:
-                    g[pos + dir * (box + 1)] = "O"
-                    g[pos + dir * box] = "."
-                pos = n
-                # Don't know why I need to do this...
-                g[pos] = "."
+        match g[pos + dir]:
+            case '.':
+                pos += dir
+            case 'O':
+                boxes = 1
+                while g[pos + dir * (boxes + 1)] == 'O':
+                    boxes += 1
+                if g[pos + dir * (boxes + 1)] == '.':
+                    for box in range(1, boxes + 1)[::-1]:
+                        g[pos + dir * box] = '.'
+                        g[pos + dir * (box + 1)]= 'O'
+                    pos += dir
 
     return sum(100 * y + x for x, y in g.find_value("O"))
 
