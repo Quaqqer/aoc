@@ -38,10 +38,9 @@ def search() -> tuple[int, int]:
             if (p + d, d) not in visited:
                 q.push((score + 1, p + d, d, path + [p + d]))
 
-        if (p, d.rot_l()) not in visited:
-            q.push((score + 1000, p, d.rot_l(), path))
-        if (p, d.rot_r()) not in visited:
-            q.push((score + 1000, p, d.rot_r(), path))
+        for ndir in [d.rot_l(), d.rot_r()]:
+            if (p, ndir) not in visited:
+                q.push((score + 1000, p, ndir, path))
     raise Exception()
 
 
