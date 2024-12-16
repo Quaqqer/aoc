@@ -31,16 +31,16 @@ def solve_a(g: Grid[str], start: Vec2[int]):
         dir = DIR_MAP[instruction]
 
         match g[pos + dir]:
-            case '.':
+            case ".":
                 pos += dir
-            case 'O':
+            case "O":
                 boxes = 1
-                while g[pos + dir * (boxes + 1)] == 'O':
+                while g[pos + dir * (boxes + 1)] == "O":
                     boxes += 1
-                if g[pos + dir * (boxes + 1)] == '.':
+                if g[pos + dir * (boxes + 1)] == ".":
                     for box in range(1, boxes + 1)[::-1]:
-                        g[pos + dir * box] = '.'
-                        g[pos + dir * (box + 1)]= 'O'
+                        g[pos + dir * box] = "."
+                        g[pos + dir * (box + 1)] = "O"
                     pos += dir
 
     return sum(100 * y + x for x, y in g.find_value("O"))
@@ -84,7 +84,7 @@ def solve_b(g: Grid[str], start: Vec2[int]):
         dir = DIR_MAP[instruction]
 
         match g[pos + dir]:
-            case '.':
+            case ".":
                 pos += dir
             case c if c in "[]":
                 gc = g.copy()
