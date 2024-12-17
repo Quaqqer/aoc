@@ -57,12 +57,9 @@ def run(a: int, b: int, c: int, pgm: list[int]) -> int:
 def find_a(
     b: int | z3.BitVecRef, c: int | z3.BitVecRef, pgm: list[int], answer: int
 ) -> int:
-    # I reverse engineered the code so I know we need 15 jumps
-    jumps = 15
-
-    solver = z3.Solver()
+    o = z3.Optimize()
     a_init = z3.BitVec("a_init", 100)
-    solver.add(a_init >= 8**15, a_init < 8**16)
+    o.minimize(a_init)
 
     i = 0
     a = a_init
@@ -101,7 +98,7 @@ def find_a(
             case 4:
                 b = b ^ c
             case 5:
-                solver.append(int(str(answer)[15 - jumps]) == get_combo(v) % 8)
+                o.add(int(str(answer)[out_digit]) == get_combo(v) % 8)
                 out_digit += 1
             case 6:
                 b = a >> get_combo(v)
@@ -111,11 +108,12 @@ def find_a(
                 raise Exception()
         i += 2
 
-    solver.check()
-    m = solver.model()
-    return cast(int, m[a_init])
+    o.check()
+    m = o.model()
+    return cast(z3.BitVecNumRef, m[a_init]).as_long()
 
 
 a, b, c, *pgm = ints(data)
 puzzle.answer_a = ",".join(str(run(a, b, c, pgm)))
-puzzle.answer_b = find_a(b, c, pgm, int("".join(map(str, pgm))))
+pgm_v = int("".join(map(str, pgm)))
+puzzle.answer_b = find_a(b, c, pgm, pgm_v)
