@@ -232,41 +232,6 @@ class Grid[T]:
 
         return Grid(cols, rows, [elem for row in l for elem in row])
 
-    def dfs(
-        self,
-        start: tuple[int, int],
-        visit: Callable[[tuple[int, int], T], bool | None],
-        is_visitable: Callable[[tuple[int, int], T], bool],
-    ):
-        """DFS Search.
-
-        Args:
-            start: The start coordinate
-            visit: On visit function, return true to finish
-            is_visitable: If a position is visitable
-
-        Returns:
-            The searched for position
-        """
-        visited = {start}
-
-        def _inner(coord: tuple[int, int]) -> tuple[int, int] | None:
-            visited.add(coord)
-
-            end = visit(coord, self[coord])
-
-            if end:
-                return coord
-
-            for n in self.neighbours4(coord):
-                if n not in visited and is_visitable(coord, self[coord]):
-                    res = _inner(coord)
-
-                    if res is not None:
-                        return res
-
-        return _inner(start)
-
     def find(
         self, f: Callable[[tuple[int, int], T], bool]
     ) -> Iterator[tuple[int, int]]:
@@ -284,7 +249,7 @@ class Grid[T]:
     ) -> Iterator[tuple[int, int]]:
         x, y = coord
 
-        for dx, dy in [(0, 1), (0, -1), (1, 0), (-1, 0)]:
+        for dx, dy in ((0, 1), (0, -1), (1, 0), (-1, 0)):
             if dx == dy == 0:
                 continue
 
