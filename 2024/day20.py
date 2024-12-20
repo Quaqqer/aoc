@@ -35,22 +35,17 @@ def search_cheats(
 ) -> Counter[int]:
     cheats = Counter()
 
-    q = deque([(start, 0)])
+    for dx in range(-max_cost, max_cost + 1):
+        for dy in range(-max_cost, max_cost + 1):
+            delta = Vec2(dx, dy)
+            if delta.manhattan() > max_cost:
+                continue
 
-    visited = set()
-    while q:
-        pos, cost = q.popleft()
+            end = start + Vec2(dx, dy)
 
-        if g[pos] == ".":
-            saved = costs[pos] - costs[start] - cost
-            if saved >= 1:
+            if end in g and g[end] == ".":
+                saved = costs[end] - costs[start] - delta.manhattan()
                 cheats[saved] += 1
-
-        if cost < max_cost:
-            for n in map(Vec2, g.neighbours4(pos.tup)):
-                if n not in visited:
-                    visited.add(n)
-                    q.append((n, cost + 1))
 
     return cheats
 
