@@ -280,9 +280,16 @@ class Grid[T]:
             for x in range(self.cols):
                 yield x, y
 
+    def vecs(self) -> Iterator[Vec2[int]]:
+        for x, y in self:
+            yield Vec2(x, y)
+
     def values(self) -> Iterator[T]:
         for x, y in self.coords():
             yield self[x, y]
+
+    def dict(self) -> dict[tuple[int, int], T]:
+        return {c: self[c] for c in self}
 
     def __iter__(self):
         return self.coords()
