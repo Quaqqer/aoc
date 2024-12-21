@@ -5,7 +5,7 @@
 import functools
 
 from aocd.models import Puzzle
-from util import Grid
+from util import Grid, sign
 
 puzzle = Puzzle(2024, int("21"))
 
@@ -28,20 +28,20 @@ def cost(from_: str, to: str, i: int, n_dirpads: int) -> int:
     x, y = poss[from_]
     dx, dy = poss[to] - poss[from_]
 
-    xdir = "<" if dx < 0 else ">"
-    ydir = "^" if dy < 0 else "v"
+    dxs = {1: ">", -1: "<"}[sign(dx)] * abs(dx) if dx != 0 else ""
+    dys = {1: "v", -1: "^"}[sign(dy)] * abs(dy) if dy != 0 else ""
 
     possibles = []
     # Move x first, then y
-    if pad[x + dx, y] != " ":
-        path = xdir * abs(dx) + ydir * abs(dy) + "A"
-        c = sum(cost(a, b, i + 1, n_dirpads) for a, b in zip("A" + path, path))
+    if pad.get(x + dx, y, " ") != " ":
+        path = "A" + dxs + dys + "A"
+        c = sum(cost(a, b, i + 1, n_dirpads) for a, b in zip(path, path[1:]))
         possibles.append(c)
 
     # Move y first, then x
-    if pad[x, y + dy] != " ":
-        path = ydir * abs(dy) + xdir * abs(dx) + "A"
-        c = sum(cost(a, b, i + 1, n_dirpads) for a, b in zip("A" + path, path))
+    if pad.get(x, y + dy, " ") != " ":
+        path = "A" + dys + dxs + "A"
+        c = sum(cost(a, b, i + 1, n_dirpads) for a, b in zip(path, path[1:]))
         possibles.append(c)
 
     return min(possibles)
