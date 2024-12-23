@@ -1,4 +1,5 @@
 # 23   00:13:40  1500      0   00:18:01   636      0
+# Networkx to the rescue. I was still pretty slow though.
 
 import itertools
 from collections import defaultdict
