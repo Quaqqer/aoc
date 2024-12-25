@@ -1,8 +1,13 @@
 # 24   00:15:03   872      0   02:19:34  1076      0
 # Graphviz pog!
+#
+# My initial solution was to check the graph with graphviz. Afterwards I looked
+# at Hyper Neutrino's video, (https://www.youtube.com/watch?v=SU6lp6wyd3I). On
+# christmas day I implemented it. Smart solution!
 
 
 import tempfile
+from typing import Iterable, cast
 
 from aocd.models import Puzzle
 from graphviz import Digraph
@@ -20,15 +25,19 @@ for line in reg_data.splitlines():
     init_regs[reg] = int(v)
 
 
-formulas = []
+def k(r0: str, r1: str) -> tuple[str, str]:
+    return cast(tuple[str, str], tuple(sorted((r0, r1))))
+
+
+type Formulas = list[tuple[str, str, str, str]]
+
+formulas: Formulas = []
 for line in formula_data.splitlines():
     a, op, b, _, res = line.split()
     formulas.append((a, op, b, res))
 
 
-def run(
-    init_regs: dict[str, int], formulas: list[tuple[str, str, str, str]]
-) -> dict[str, int] | None:
+def run(init_regs: dict[str, int], formulas: Formulas) -> dict[str, int] | None:
     vals = init_regs.copy()
     done = False
     while not done:
@@ -70,7 +79,13 @@ def get_var(regs: dict[str, int], var: str) -> int:
     return out
 
 
-def view_graph(formulas: list[tuple[str, str, str, str]]):
+def solve_a() -> int:
+    regs = run(init_regs, formulas)
+    assert regs is not None
+    return get_var(regs, "z")
+
+
+def view_graph(formulas: Formulas):
     g = Digraph("AoC day 24 adder")
 
     for i, (a, op, b, res) in enumerate(formulas):
@@ -84,32 +99,88 @@ def view_graph(formulas: list[tuple[str, str, str, str]]):
     g.render(f.removesuffix(".svg"), format="svg", engine="dot", view=True)
 
 
-swaps = []
+def invalids(formulas: Formulas) -> tuple[tuple[int, int], list[str]] | None:
+    ands: dict[tuple[str, str], str] = {}
+    xors: dict[tuple[str, str], str] = {}
+    ors: dict[tuple[str, str], str] = {}
+
+    for a, op, b, res in formulas:
+        d = {"AND": ands, "OR": ors, "XOR": xors}[op]
+        d[k(a, b)] = res
+
+    bits = 0
+    while f"x{bits + 1:02}" in init_regs:
+        bits += 1
+
+    if xors[k("x00", "y00")] != "z00":
+        return ((0, 0), ["z00"])
+
+    carry = ands[k("x00", "y00")]
+    for i in range(1, bits + 1):
+        x, y, z = f"x{i:02}", f"y{i:02}", f"z{i:02}"
+        zi = xors[k(x, y)]
+        if k(zi, carry) not in xors:
+            return (i, 0), [zi]
+
+        z_expected = xors[k(zi, carry)]
+        if z != z_expected:
+            return ((i, 1), [zi, z_expected])
+
+        ci0 = ands[k(x, y)]
+        if k(zi, carry) not in ands:
+            return ((i, 2), [zi])
+        ci1 = ands[k(zi, carry)]
+        if k(ci0, ci1) not in ors:
+            return ((i, 3), [ci0, ci1])
+        carry = ors[k(ci0, ci1)]
+
+    return None
 
 
-def swap(r0: str, r1: str):
-    global swaps
-    swaps = sorted(swaps + [r0, r1])
+def swap_formulas(
+    formulas: Formulas, to_swap: str
+) -> Iterable[tuple[list[tuple[str, str, str, str]], list[str]]]:
+    [i] = [i for i in range(len(formulas)) if formulas[i][-1] == to_swap]
 
-    [i] = [i for i, v in enumerate(formulas) if v[-1] == r0]
-    [j] = [i for i, v in enumerate(formulas) if v[-1] == r1]
-    f1 = formulas[i]
-    f2 = formulas[j]
-    nf1 = f1[:-1] + f2[-1:]
-    nf2 = f2[:-1] + f1[-1:]
-    formulas[i] = nf1
-    formulas[j] = nf2
+    for j in range(len(formulas)):
+        if i == j:
+            continue
+
+        f1 = formulas[i]
+        f2 = formulas[j]
+        nf1 = f1[:-1] + f2[-1:]
+        nf2 = f2[:-1] + f1[-1:]
+        nfs = [formulas[k] for k in range(len(formulas)) if k != i and k != j] + [
+            nf1,
+            nf2,
+        ]
+        swaps = [f1[-1], f2[-1]]
+        yield nfs, swaps
 
 
-puzzle.answer_a = get_var(run(init_regs, formulas), "z")
+def solve_b(formulas: Formulas) -> str:
+    """Assumes that there is just one single swap per adder"""
 
-# I have no automatic solution for part 2. Look at the graph and make sure that
-# it is a proper adder. Swap the nodes that are wrong manually. There should be
-# 4 swaps.
+    swaps = []
+    iv = invalids(formulas)
+    while iv is not None:
+        pos, possible_wrongs = iv
 
-# swap("aaa", "bbb")
-# swap("ccc", "ddd")
-# swap("eee", "fff")
-# swap("ggg", "hhh")
-# view_graph(formulas)
-# puzzle.answer_b = ','.join(swaps)
+        for nfs, swapped in (
+            v for pw in possible_wrongs for v in swap_formulas(formulas, pw)
+        ):
+            new_iv = invalids(nfs)
+            if new_iv is None or pos < new_iv[0]:
+                formulas = nfs
+                swaps += swapped
+                break
+        else:
+            assert False, f"Could not find swap for {possible_wrongs}"
+
+        iv = invalids(formulas)
+
+    return ",".join(sorted(swaps))
+
+
+puzzle.answer_a = solve_a()
+puzzle.answer_b = solve_b(formulas)
