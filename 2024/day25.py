@@ -8,21 +8,17 @@ puzzle = Puzzle(2024, int("25"))
 
 data = puzzle.input_data
 
-locks = []
-keys = []
+locks: list[tuple[int, ...]] = []
+keys: list[tuple[int, ...]] = []
 
-for chunk in data.split("\n\n"):
-    chunk = Grid.from_lines(chunk)
-    heights = [sum(v == "#" for v in chunk[i, :]) for i in range(chunk.cols)]
-    if all(v == "#" for v in chunk[:, -1]):
+for g in map(Grid.from_lines, data.split("\n\n")):
+    heights = tuple(sum(v == "#" for v in g[i, :]) for i in range(g.cols))
+
+    if all(v == "#" for v in g[:, -1]):
         keys.append(heights)
     else:
         locks.append(heights)
 
-s = 0
-for lock in locks:
-    for key in keys:
-        if all(a + b <= 7 for a, b in zip(lock, key)):
-            s += 1
-
-puzzle.answer_a = s
+puzzle.answer_a = sum(
+    all(a + b <= 7 for a, b in zip(lock, key)) for lock in locks for key in keys
+)
