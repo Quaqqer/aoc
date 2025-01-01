@@ -31,20 +31,20 @@ def cost(from_: str, to: str, i: int, n_dirpads: int) -> int:
     dxs = {1: ">", -1: "<"}[sign(dx)] * abs(dx) if dx != 0 else ""
     dys = {1: "v", -1: "^"}[sign(dy)] * abs(dy) if dy != 0 else ""
 
-    possibles = []
+    paths = []
+
     # Move x first, then y
     if pad.get(x + dx, y, " ") != " ":
-        path = "A" + dxs + dys + "A"
-        c = sum(cost(a, b, i + 1, n_dirpads) for a, b in zip(path, path[1:]))
-        possibles.append(c)
+        paths += ["A" + dxs + dys + "A"]
 
     # Move y first, then x
     if pad.get(x, y + dy, " ") != " ":
-        path = "A" + dys + dxs + "A"
-        c = sum(cost(a, b, i + 1, n_dirpads) for a, b in zip(path, path[1:]))
-        possibles.append(c)
+        paths += ["A" + dys + dxs + "A"]
 
-    return min(possibles)
+    return min(
+        sum(cost(a, b, i + 1, n_dirpads) for a, b in zip(path, path[1:]))
+        for path in paths
+    )
 
 
 def solve(n: int):
