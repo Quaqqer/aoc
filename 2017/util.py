@@ -882,3 +882,40 @@ class Mat:
     def __setitem__(self, coord: tuple[int, int], v: int):
         y, x = coord
         self.values[y][x] = v
+
+
+class UnionFind[T]:
+    def __init__(self):
+        self.__parent: dict[T, T] = {}
+        self.__rank: dict[T, int] = {}
+
+    def __ensure_exists(self, v: T):
+        if v not in self.__parent:
+            self.__parent[v] = v
+            self.__rank[v] = 0
+
+    def find(self, v: T) -> T:
+        self.__ensure_exists(v)
+
+        if self.__parent[v] == v:
+            return v
+
+        parent = self.find(self.__parent[v])
+        self.__parent[v] = parent
+        return parent
+
+    def union(self, l: T, r: T):
+        self.__ensure_exists(l)
+        self.__ensure_exists(r)
+
+        l = self.find(l)
+        r = self.find(r)
+
+        if l != r:
+            if self.__rank[l] < self.__rank[r]:
+                l, r = r, l
+
+            self.__parent[r] = l
+
+            if self.__rank[l] == self.__rank[r]:
+                self.__rank[l] += 1
