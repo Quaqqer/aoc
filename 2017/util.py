@@ -662,6 +662,9 @@ class Vec3[T: (int, float)]:
     def __sub__(self, other: Vec3[T]) -> Vec3[T]:
         return Vec3(self.__x - other.__x, self.__y - other.__y, self.__z - other.__z)
 
+    def __neg__(self) -> Vec3[T]:
+        return Vec3(-self.__x, -self.__y, -self.__z)
+
     def __mul__(self, other: Vec3[T]) -> Vec3[T]:
         return Vec3(self.__x * other.__x, self.__y * other.__y, self.__z * other.__z)
 
