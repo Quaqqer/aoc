@@ -3,9 +3,11 @@ from __future__ import annotations
 import heapq
 import math
 import re
+import subprocess
 from collections import deque
 from copy import deepcopy
 from typing import (
+    Any,
     Callable,
     Iterable,
     Iterator,
@@ -924,3 +926,15 @@ class UnionFind[T]:
 
             if self.__rank[l] == self.__rank[r]:
                 self.__rank[l] += 1
+
+
+def copy(text: str):
+    p = subprocess.Popen(["wl-copy"], stdin=subprocess.PIPE)
+    _, _ = p.communicate(input=text.encode("utf-8"))
+    p.wait()
+
+
+def cpp(v: Any):
+    text = str(v)
+    copy(text)
+    print(text)
