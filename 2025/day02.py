@@ -13,9 +13,15 @@ def is_invalid_a(id: str):
 
 
 def is_invalid_b(id: str):
-    for j in range(1, len(id)):
-        if id == id[:j] * (len(id) // (j)):
+    n = len(id)
+
+    for j in range(1, n):
+        if n % j != 0:
+            continue
+
+        if id == id[:j] * (n // j):
             return True
+
     return False
 
 
@@ -26,11 +32,11 @@ def solve(input: str, part_b: bool):
         a, b = l.split("-")
         a, b = int(a), int(b)
 
-        for i in range(a, b + 1):
-            if not part_b and is_invalid_a(str(i)):
-                s += i
-            elif part_b and is_invalid_b(str(i)):
-                s += i
+        for id in range(a, b + 1):
+            if not part_b and is_invalid_a(str(id)):
+                s += id
+            elif part_b and is_invalid_b(str(id)):
+                s += id
 
     return s
 
