@@ -1,3 +1,9 @@
+# 3   00:01:50   00:17:41
+# I can't be stopped with good part 1 times?! Tried to solve it too quickly in
+# part 2 and got a 5 minute timeout. I should really assert that the answer for
+# the example is correct. 😅
+
+
 # pyright: basic
 
 import functools

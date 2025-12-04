@@ -1,3 +1,7 @@
+# 1   00:02:16   00:17:14
+# Off to a good start with part 1, tried to be smart on part 2, which was not
+# smart 😅
+
 # pyright: basic
 
 from aocd.models import Puzzle

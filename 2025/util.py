@@ -22,6 +22,19 @@ from typing import (
 type Coord = tuple[int, int]
 
 
+DELTA_4: tuple[tuple[int, int], ...] = (-1, 0), (1, 0), (0, -1), (0, 1)
+DELTA_8: tuple[tuple[int, int], ...] = (
+    (-1, -1),
+    (0, -1),
+    (1, -1),
+    (1, 0),
+    (1, 1),
+    (0, 1),
+    (-1, 1),
+    (-1, 0),
+)
+
+
 class Grid[T]:
     """A 2D grid of type T"""
 
@@ -52,22 +65,23 @@ class Grid[T]:
     def rows(self) -> int:
         return self._rows
 
-    def is_inside(self, x: int, y: int) -> bool:
+    def is_inside(self, index: tuple[int, int]) -> bool:
+        x, y = index
         return 0 <= x < self._cols and 0 <= y < self._rows
 
-    def is_outside(self, x: int, y: int) -> bool:
-        return not self.is_inside(x, y)
+    def is_outside(self, index: tuple[int, int]) -> bool:
+        return not self.is_inside(index)
 
     def __contains__(self, coord: Coord | Vec2[int]) -> bool:
         match coord:
             case int(x), int(y):
-                return self.is_inside(x, y)
+                return self.is_inside(coord)
             case Vec2(x, y):
-                return self.is_inside(x, y)
+                return self.is_inside((x, y))
             case coord:
                 assert_never(coord)
 
-    def get[E](self, x: int, y: int, default: E = None) -> T | E:
+    def get[E](self, index: tuple[int, int], default: E = None) -> T | E:
         """Get an item in the grid
 
         Args:
@@ -77,8 +91,10 @@ class Grid[T]:
         Returns:
             The item
         """
-        if (x, y) not in self:
+        if index not in self:
             return default
+
+        y, x = index
 
         return self._grid[y][x]
 
@@ -289,14 +305,14 @@ class Grid[T]:
     ) -> Iterator[tuple[int, int]]:
         x, y = coord
 
-        for dx, dy in [(0, 1), (0, -1), (1, 0), (-1, 0)]:
+        for dx, dy in DELTA_4:
             if dx == dy == 0:
                 continue
 
             nx = x + dx
             ny = y + dy
 
-            if (not inside) or self.is_inside(nx, ny):
+            if (not inside) or self.is_inside((nx, ny)):
                 yield nx, ny
 
     def neighbours8(
@@ -304,16 +320,12 @@ class Grid[T]:
     ) -> Iterator[tuple[int, int]]:
         x, y = coord
 
-        for dx in [-1, 0, 1]:
-            for dy in [-1, 0, 1]:
-                if dx == dy == 0:
-                    continue
+        for dx, dy in DELTA_8:
+            nx = x + dx
+            ny = y + dy
 
-                nx = x + dx
-                ny = y + dy
-
-                if (not inside) or self.is_inside(nx, ny):
-                    yield nx, ny
+            if (not inside) or self.is_inside((nx, ny)):
+                yield nx, ny
 
     def coords(self) -> Iterator[tuple[int, int]]:
         for x in range(self.cols):
@@ -932,11 +944,11 @@ class UnionFind[T]:
 def copy(text: str):
     system = platform.system()
     match system:
-        case 'Darwin':
+        case "Darwin":
             p = subprocess.Popen(["pbcopy"], stdin=subprocess.PIPE)
             _, _ = p.communicate(input=text.encode("utf-8"))
             p.wait()
-        case 'Linux':
+        case "Linux":
             p = subprocess.Popen(["wl-copy"], stdin=subprocess.PIPE)
             _, _ = p.communicate(input=text.encode("utf-8"))
             p.wait()
