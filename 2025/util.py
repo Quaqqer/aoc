@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import heapq
 import math
+import platform
 import re
 import subprocess
 from collections import deque
@@ -929,9 +930,18 @@ class UnionFind[T]:
 
 
 def copy(text: str):
-    p = subprocess.Popen(["wl-copy"], stdin=subprocess.PIPE)
-    _, _ = p.communicate(input=text.encode("utf-8"))
-    p.wait()
+    system = platform.system()
+    match system:
+        case 'Darwin':
+            p = subprocess.Popen(["pbcopy"], stdin=subprocess.PIPE)
+            _, _ = p.communicate(input=text.encode("utf-8"))
+            p.wait()
+        case 'Linux':
+            p = subprocess.Popen(["wl-copy"], stdin=subprocess.PIPE)
+            _, _ = p.communicate(input=text.encode("utf-8"))
+            p.wait()
+        case _:
+            raise Exception(f"Copying to clipboard on {system} is unimplemented.")
 
 
 def cpp(v: Any):
