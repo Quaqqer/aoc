@@ -462,6 +462,12 @@ class Range:
     def len(self) -> int:
         return self.end - self.start
 
+    def __contains__(self, v: int) -> bool:
+        return self.start <= v < self.end
+
+    def __iter__(self):
+        return range(self.start, self.end)
+
 
 def unindent(s: str) -> str:
     return "\n".join(l.lstrip() for l in s.splitlines())
