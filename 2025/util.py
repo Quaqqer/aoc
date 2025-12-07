@@ -349,6 +349,9 @@ class Grid[T]:
         return self._hash
 
     def __eq__(self, other: object):
+        if self is other:
+            return True
+
         if not isinstance(other, Grid):
             return False
 
