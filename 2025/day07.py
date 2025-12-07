@@ -35,19 +35,16 @@ def solve_a(input: str):
     return splits
 
 
+@functools.cache
 def splits(g: Grid[str], p: tuple[int, int]) -> int:
-    @functools.cache
-    def inner(p: tuple[int, int]):
-        x, y = p
+    x, y = p
 
-        if p not in g:
-            return 1
-        elif g[p] == "^":
-            return inner((x + 1, y + 1)) + inner((x - 1, y + 1))
-        else:
-            return inner((x, y + 1))
-
-    return inner(p)
+    if p not in g:
+        return 1
+    elif g[p] == "^":
+        return splits(g, (x + 1, y + 1)) + splits(g, (x - 1, y + 1))
+    else:
+        return splits(g, (x, y + 1))
 
 
 def solve_b(input: str):

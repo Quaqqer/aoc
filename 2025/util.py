@@ -43,6 +43,7 @@ class Grid[T]:
         self._rows = rows
         # Index by _grid[y][x]
         self._grid = _grid
+        self._hash: int | None = None
 
     def copy(self) -> Grid[T]:
         return Grid(cols=self._cols, rows=self._rows, _grid=deepcopy(self._grid))
@@ -98,7 +99,7 @@ class Grid[T]:
 
         return self._grid[y][x]
 
-    def set(self, x: int, y: int, v: T):
+    def _set(self, x: int, y: int, v: T):
         """Set an item in the grid.
 
         Args:
@@ -169,25 +170,27 @@ class Grid[T]:
             coord: (x, y) coordinate
             v: Value
         """
+        self._hash = None
+
         match index:
             case int(x), int(y):
-                self.set(x, y, v)
+                self._set(x, y, v)
             case Vec2(x, y):
-                self.set(x, y, v)
+                self._set(x, y, v)
             case x, int(y) if isinstance(x, slice):  # pyright: ignore[reportUnnecessaryIsInstance]
                 x_start = x.start if x.start is not None else 0
                 x_stop = x.stop if x.stop is not None else self.cols
                 x_step = x.step if x.step is not None else 1
 
                 for xx in range(x_start, x_stop, x_step):
-                    self.set(xx, y, v)
+                    self._set(xx, y, v)
             case int(x), y if isinstance(y, slice):  # pyright: ignore[reportUnnecessaryIsInstance]
                 y_start = y.start if y.start is not None else 0
                 y_stop = y.stop if y.stop is not None else self.rows
                 y_step = y.step if y.step is not None else 1
 
                 for yy in range(y_start, y_stop, y_step):
-                    self.set(x, yy, v)
+                    self._set(x, yy, v)
             case x, y if isinstance(x, slice) and isinstance(y, slice):
                 x_start = x.start if x.start is not None else 0
                 x_stop = x.stop if x.stop is not None else self.cols
@@ -199,7 +202,7 @@ class Grid[T]:
 
                 for xx in range(x_start, x_stop, x_step):
                     for yy in range(y_start, y_stop, y_step):
-                        self.set(xx, yy, v)
+                        self._set(xx, yy, v)
             case _:
                 raise Exception("Invalid arguments")
 
@@ -339,8 +342,11 @@ class Grid[T]:
     def __iter__(self):
         return self.coords()
 
-    def __hash__(self):
-        return hash(tuple(tuple(c for c in r) for r in self._grid))
+    def __hash__(self) -> int:
+        if self._hash is not None:
+            return self._hash
+        self._hash = hash(tuple(tuple(c for c in r) for r in self._grid))
+        return self._hash
 
     def __eq__(self, other: object):
         if not isinstance(other, Grid):
