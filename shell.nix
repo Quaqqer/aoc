@@ -13,6 +13,7 @@ pkgs.mkShell {
         scipy
         z3-solver
         networkx
+        shapely
       ]
     ))
   ];

@@ -1,6 +1,6 @@
 # 9   00:03:14   01:08:00
-# Started looking at line segment intersection, way too complicated for a grid
-# problem. 😅
+# Started looking at line segment intersection, but my brain is not ready to
+# solve the geometry at this time... 😅
 
 # pyright: basic
 
@@ -35,6 +35,24 @@ def ok(v1: Vec2[int], v2: Vec2[int], reds: list[Vec2[int]], part2: bool) -> bool
             return False
 
     return True
+
+
+def ok_shapely(v1: Vec2[int], v2: Vec2[int], reds: list[Vec2[int]], part2: bool):
+    if not part2:
+        return True
+
+    import shapely
+
+    p = shapely.Polygon([(p.x, p.y) for p in reds])
+
+    miny = min(v1.y, v2.y)
+    maxy = max(v1.y, v2.y)
+    minx = min(v1.x, v2.x)
+    maxx = max(v1.x, v2.x)
+
+    rect = shapely.Polygon([(minx, miny), (maxx, miny), (maxx, maxy), (minx, maxy)])
+
+    return p.contains(rect)
 
 
 def solve(input: str, part2: bool):
