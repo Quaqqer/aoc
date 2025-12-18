@@ -13,11 +13,25 @@ from typing import (
     Iterable,
     Iterator,
     Literal,
+    Protocol,
+    Self,
     Sequence,
     assert_never,
     cast,
     overload,
 )
+
+
+class SupportsLT(Protocol):
+    def __lt__(self, other: Self) -> bool: ...
+
+
+class SupportsGT(Protocol):
+    def __gt__(self, other: Self) -> bool: ...
+
+
+type SupportsComparison = SupportsLT | SupportsGT
+
 
 type Coord = tuple[int, int]
 
@@ -75,14 +89,20 @@ class Grid[T]:
 
     def __contains__(self, coord: Coord | Vec2[int]) -> bool:
         match coord:
-            case int(x), int(y):
-                return self.is_inside(coord)
             case Vec2(x, y):
                 return self.is_inside((x, y))
+            case int(x), int(y):
+                return self.is_inside(coord)
             case coord:
                 assert_never(coord)
 
-    def get[E](self, index: tuple[int, int], default: E = None) -> T | E:
+    @overload
+    def get(self, index: tuple[int, int], default: T) -> T: ...
+
+    @overload
+    def get(self, index: tuple[int, int], default: None = None) -> T | None: ...
+
+    def get(self, index: tuple[int, int], default: T | None = None) -> T | None:
         """Get an item in the grid
 
         Args:
@@ -544,7 +564,7 @@ def shoelace(points: list[Coord]) -> int:
     )
 
 
-class Vec2[T: (int, float)]:
+class Vec2[T: int | float]:
     @overload
     def __init__(self, x: T, y: T) -> None: ...
 
@@ -554,8 +574,8 @@ class Vec2[T: (int, float)]:
     def __init__(self, x: T | tuple[T, T], y: T | None = None):
         match (x, y):
             case ((xx, yy), None):
-                self.__x: T = xx  # pyright: ignore[reportRedeclaration]
-                self.__y: T = yy  # pyright: ignore[reportRedeclaration]
+                self.__x: T = xx
+                self.__y: T = yy
             case (x, y):
                 self.__x: T = cast(T, x)
                 self.__y: T = cast(T, y)
@@ -673,7 +693,7 @@ class Vec2[T: (int, float)]:
         )
 
 
-class Vec3[T: (int, float)]:
+class Vec3[T: int | float]:
     def __init__(self, x: T, y: T, z: T):
         self.__x = x
         self.__y = y
@@ -763,7 +783,7 @@ class Vec3[T: (int, float)]:
         )
 
 
-def sign[T: (int, float)](a: T) -> int:
+def sign[T: int | float](a: T) -> int:
     if a < 0:
         return -1
     if a > 0:
@@ -771,7 +791,7 @@ def sign[T: (int, float)](a: T) -> int:
     return 0
 
 
-def spaceship[T: (int, float)](a: T, b: T) -> int:
+def spaceship[T: int | float](a: T, b: T) -> int:
     return sign(a - b)
 
 
@@ -816,16 +836,16 @@ def sliding_window[T](iterable: Iterable[T], size: int) -> Iterable[tuple[T, ...
             break
 
 
-class Heap[T]:
+class Heap[T: SupportsComparison]:
     def __init__(self, iterable: Iterable[T] = []):
         self.__queue = list(iterable)
-        heapq.heapify(self.__queue)  # pyright: ignore[reportArgumentType]
+        heapq.heapify(self.__queue)
 
     def push(self, v: T):
-        heapq.heappush(self.__queue, v)  # pyright: ignore[reportArgumentType]
+        heapq.heappush(self.__queue, v)
 
     def pop(self) -> T:
-        return heapq.heappop(self.__queue)  # pyright: ignore[reportUnknownVariableType, reportArgumentType]
+        return heapq.heappop(self.__queue)
 
     def __bool__(self) -> bool:
         return len(self.__queue) != 0

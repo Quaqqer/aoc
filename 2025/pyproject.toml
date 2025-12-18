@@ -1,0 +1,10 @@
+[project]
+name = "aoc-2025"
+version = "0.1.0"
+readme = "README.md"
+requires-python = ">=3.14"
+dependencies = [
+    "advent-of-code-data>=2.1.1",
+    "shapely>=2.1.2",
+    "z3-solver>=4.15.4.0",
+]
