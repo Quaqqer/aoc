@@ -1,0 +1,9 @@
+[project]
+name = "aoc-2023"
+version = "0.1.0"
+requires-python = ">=3.14"
+dependencies = [
+    "advent-of-code-data>=2.1.1",
+    "networkx>=3.6.1",
+    "z3-solver>=4.15.4.0",
+]
