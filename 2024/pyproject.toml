@@ -1,0 +1,14 @@
+[project]
+name = "aoc-2024"
+version = "0.1.0"
+requires-python = ">=3.14"
+dependencies = [
+    "advent-of-code-data>=2.1.1",
+    "graphviz>=0.21",
+    "networkx>=3.6.1",
+    "numpy>=2.3.5",
+    "z3-solver>=4.15.4.0",
+]
+
+[dependency-groups]
+dev = []
